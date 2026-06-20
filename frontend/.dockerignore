@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+e2e/
+test-results/
+playwright.config.ts
+README.md

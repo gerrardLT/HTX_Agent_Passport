@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTX Agent Passport — AI Agent Control Plane</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Variant C · 最佳设计师：Pentagram 编辑式极简 + 金融级信任感 ─── */
+/* 逻辑：Pentagram/原研哉的设计哲学——留白即力量，字体即性格，克制即高级 */
+/* 灵感：顶级金融机构年报 + 瑞士排版 + 日本侘寂留白 */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #FAFAF8;
+  --fg: #111111;
+  --fg-2: #555555;
+  --fg-3: #999999;
+  --accent: #1A56DB;
+  --accent-light: #EBF0FB;
+  --warm: #C75B12;
+  --border: #E5E5E0;
+  --surface: #F2F1ED;
+  --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sans: 'Outfit', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 0 64px;
+  height: 72px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-brand {
+  font-family: var(--serif);
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+.nav-right {
+  display: flex; gap: 40px; align-items: center;
+}
+
+.nav-right a {
+  font-size: 14px; font-weight: 400;
+  color: var(--fg-2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-right a:hover { color: var(--fg); }
+
+.nav-btn {
+  font-family: var(--sans);
+  font-size: 14px; font-weight: 500;
+  padding: 10px 24px;
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.nav-btn:hover { opacity: 0.8; }
+
+/* ─── HERO ─── */
+.hero {
+  padding: 200px 64px 160px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--fg-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(56px, 6.5vw, 96px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  margin-bottom: 48px;
+  max-width: 900px;
+  color: var(--fg);
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.hero-meta {
+  display: flex;
+  gap: 64px;
+  align-items: flex-end;
+  margin-top: 48px;
+}
+
+.hero-desc {
+  max-width: 440px;
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--fg-2);
+  line-height: 1.75;
+}
+
+.hero-cta {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.btn-dark {
+  font-family: var(--sans);
+  font-size: 15px; font-weight: 500;
+  padding: 16px 40px;
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-align: center;
+}
+
+.btn-dark:hover { opacity: 0.8; }
+
+.btn-light {
+  font-family: var(--sans);
+  font-size: 15px; font-weight: 400;
+  padding: 16px 40px;
+  background: transparent;
+  color: var(--fg);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.2s;
+  text-align: center;
+}
+
+.btn-light:hover { border-color: var(--fg); }
+
+/* ─── DIVIDER ─── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0 64px;
+  max-width: 1400px;
+}
+
+/* ─── MANIFESTO ─── */
+.manifesto {
+  padding: 160px 64px;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  align-items: start;
+}
+
+.manifesto-left {}
+
+.manifesto-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.manifesto-quote {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  margin-bottom: 32px;
+}
+
+.manifesto-quote em {
+  font-style: italic;
+  color: var(--warm);
+}
+
+.manifesto-right {
+  padding-top: 8px;
+}
+
+.manifesto-body {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--fg-2);
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+/* ─── CAPABILITIES ─── */
+.capabilities {
+  padding: 160px 64px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cap-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  margin-bottom: 96px;
+}
+
+.cap-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.cap-desc {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--fg-2);
+  line-height: 1.8;
+  padding-top: 12px;
+}
+
+.cap-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cap-item {
+  display: grid;
+  grid-template-columns: 48px 200px 1fr;
+  gap: 32px;
+  padding: 36px 0;
+  border-top: 1px solid var(--border);
+  align-items: start;
+  transition: padding-left 0.3s;
+}
+
+.cap-item:hover { padding-left: 12px; }
+
+.cap-item:last-child { border-bottom: 1px solid var(--border); }
+
+.cap-num {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--fg-3);
+  padding-top: 2px;
+}
+
+.cap-name {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding-top: 0;
+}
+
+.cap-detail {
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--fg-2);
+  line-height: 1.7;
+}
+
+/* ─── DEFENSE SECTION ─── */
+.defense {
+  background: var(--surface);
+  padding: 160px 64px;
+}
+
+.defense-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.defense-header {
+  margin-bottom: 80px;
+}
+
+.defense-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+.defense-subtitle {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--fg-2);
+  line-height: 1.8;
+  max-width: 520px;
+}
+
+.defense-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+}
+
+.d-block {
+  position: relative;
+}
+
+.d-block-num {
+  font-family: var(--serif);
+  font-size: 120px;
+  font-weight: 400;
+  color: var(--border);
+  line-height: 0.85;
+  margin-bottom: 24px;
+  letter-spacing: -0.04em;
+}
+
+.d-block-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.d-block-desc {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--fg-2);
+  line-height: 1.75;
+}
+
+.d-block-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+  margin-top: 20px;
+  text-transform: uppercase;
+}
+
+/* ─── FLOW SECTION ─── */
+.flow {
+  padding: 160px 64px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.flow-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  margin-bottom: 80px;
+}
+
+.flow-title {
+  font-family: var(--serif);
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.flow-desc {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--fg-2);
+  line-height: 1.8;
+  padding-top: 12px;
+}
+
+.flow-track {
+  margin-bottom: 48px;
+}
+
+.flow-track-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-3);
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+}
+
+.flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.flow-step {
+  padding: 14px 22px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+
+.flow-step.hl {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
+
+.flow-step.success {
+  background: #F0FAF0;
+  border-color: #B7E4B7;
+  color: #1A7A1A;
+}
+
+.flow-step.fail {
+  background: #FDF2F2;
+  border-color: #F5C6C6;
+  color: #C53030;
+}
+
+.flow-line {
+  width: 32px;
+  height: 1px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.flow-branch-note {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-3);
+  margin-left: 24px;
+}
+
+/* ─── CTA ─── */
+.cta {
+  padding: 200px 64px;
+  text-align: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  border-top: 1px solid var(--border);
+}
+
+.cta h2 {
+  font-family: var(--serif);
+  font-size: clamp(44px, 5vw, 72px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 32px;
+}
+
+.cta h2 em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.cta p {
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--fg-2);
+  margin-bottom: 56px;
+  max-width: 480px;
+  margin-left: auto; margin-right: auto;
+  line-height: 1.75;
+}
+
+.cta-buttons {
+  display: flex; gap: 16px; justify-content: center;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 64px;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+footer span {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-3);
+  letter-spacing: 0.02em;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  nav, .hero, .manifesto, .capabilities, .defense, .flow, .cta { padding-left: 32px; padding-right: 32px; }
+  .manifesto, .cap-header, .flow-header { grid-template-columns: 1fr; gap: 32px; }
+  .defense-grid { grid-template-columns: 1fr; }
+  .cap-item { grid-template-columns: 1fr; gap: 8px; }
+  .hero-meta { flex-direction: column; gap: 32px; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">HTX Agent Passport</div>
+  <div class="nav-right">
+    <a href="#capabilities">功能</a>
+    <a href="#defense">安全</a>
+    <a href="#flow">流程</a>
+    <button class="nav-btn">开始使用</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">AI Agent Control Plane for Crypto</div>
+  <h1>当 AI 操作真金白银，<br>谁来确保它<em>不犯错</em></h1>
+  
+  <div class="hero-meta">
+    <p class="hero-desc">HTX Agent Passport 是面向加密货币交易的零信任执行框架。LLM 输出仅为提案，每一笔操作须经策略引擎确定性裁决后方可执行。</p>
+    <div class="hero-cta">
+      <button class="btn-dark">进入控制台 →</button>
+      <button class="btn-light">查看技术文档</button>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <div class="manifesto-left">
+    <div class="manifesto-label">设计哲学</div>
+    <p class="manifesto-quote">不是限制 AI 的能力，<br>而是为它划定<em>可信赖的边界</em>。</p>
+  </div>
+  <div class="manifesto-right">
+    <p class="manifesto-body">在加密货币交易中，一个错误的 AI 决策可能意味着真实的资金损失。HTX Agent Passport 的核心理念很简单——我们不信任 AI 的输出，我们信任的是约束 AI 的系统。</p>
+    <p class="manifesto-body">权限定义边界，策略实施裁决，审计记录一切。三位一体，构成 AI 代理可信赖的执行基础设施。</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CAPABILITIES -->
+<section class="capabilities" id="capabilities">
+  <div class="cap-header">
+    <h2 class="cap-title">六项核心能力</h2>
+    <p class="cap-desc">构建端到端的安全执行链路——从意图感知到策略裁决，从审批兜底到审计追溯。每一个环节都经过精心设计，确保 AI 代理在可信赖的框架内行动。</p>
+  </div>
+  
+  <div class="cap-list">
+    <div class="cap-item">
+      <span class="cap-num">01</span>
+      <span class="cap-name">零信任执行</span>
+      <span class="cap-detail">LLM 的输出仅是一份提案。任何操作都必须经过 Policy Engine 的七步确定性裁决，杜绝 AI 幻觉带来的资金风险。</span>
+    </div>
+    <div class="cap-item">
+      <span class="cap-num">02</span>
+      <span class="cap-name">信封加密</span>
+      <span class="cap-detail">API 密钥通过 Vault 主密钥加密存储，运行时解密、用后即焚。密钥从不以明文形式出现在数据库或日志中。</span>
+    </div>
+    <div class="cap-item">
+      <span class="cap-num">03</span>
+      <span class="cap-name">Merkle 审计链</span>
+      <span class="cap-detail">每一次状态变更、策略裁决、执行结果都记录为审计事件，形成哈希链并定期锚定 STH，可验证且不可篡改。</span>
+    </div>
+    <div class="cap-item">
+      <span class="cap-num">04</span>
+      <span class="cap-name">人工审批兜底</span>
+      <span class="cap-detail">高危操作自动触发 HITL 审批流程。用户通过前端界面确认或拒绝，超时自动过期。</span>
+    </div>
+    <div class="cap-item">
+      <span class="cap-num">05</span>
+      <span class="cap-name">策略热更新</span>
+      <span class="cap-detail">Passport 策略支持运行时调整——单笔限额、日累计限额、允许币种、风险阈值均可实时配置。</span>
+    </div>
+    <div class="cap-item">
+      <span class="cap-num">06</span>
+      <span class="cap-name">Stale Price 防护</span>
+      <span class="cap-detail">审批到执行之间若市场剧烈波动，执行网关自动检测价格偏离度，超过阈值时阻断执行，避免滑点损失。</span>
+    </div>
+  </div>
+</section>
+
+<!-- DEFENSE -->
+<section class="defense" id="defense">
+  <div class="defense-inner">
+    <div class="defense-header">
+      <h2 class="defense-title">三道纵深防线</h2>
+      <p class="defense-subtitle">每一层独立运作、互为冗余。即使某一层失效，后续层仍能拦截风险——这是 defense-in-depth 的工程实践。</p>
+    </div>
+    
+    <div class="defense-grid">
+      <div class="d-block">
+        <div class="d-block-num">1</div>
+        <div class="d-block-title">规则路由拦截</div>
+        <div class="d-block-desc">基于关键词和语义的第一道过滤——提现、借贷、跨链转账等高危意图在进入 AI 规划前即被硬拦截。</div>
+        <div class="d-block-tag">Hard Block · 零容忍</div>
+      </div>
+      <div class="d-block">
+        <div class="d-block-num">2</div>
+        <div class="d-block-title">Policy Engine 裁决</div>
+        <div class="d-block-desc">纯函数策略引擎，对操作计划执行七步确定性检查：金额、币种、日限额、风险评分、幂等性。</div>
+        <div class="d-block-tag">Deterministic · 无状态</div>
+      </div>
+      <div class="d-block">
+        <div class="d-block-num">3</div>
+        <div class="d-block-title">执行网关校验</div>
+        <div class="d-block-desc">审批后、执行前的最终安全门——聚合当日真实累计、检测市场价格偏离、验证幂等性。</div>
+        <div class="d-block-tag">Last Gate · 行锁防竞态</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section class="flow" id="flow">
+  <div class="flow-header">
+    <h2 class="flow-title">Action 生命周期</h2>
+    <p class="flow-desc">从用户输入自然语言到操作终态，每一步状态转换都经过严格校验并记录审计事件。所有路径都是确定性的——没有黑箱。</p>
+  </div>
+  
+  <div class="flow-track">
+    <div class="flow-track-label">主路径 — 成功执行</div>
+    <div class="flow-steps">
+      <div class="flow-step hl">REQUESTED</div>
+      <div class="flow-line"></div>
+      <div class="flow-step">PLANNING</div>
+      <div class="flow-line"></div>
+      <div class="flow-step">PLAN_VALIDATED</div>
+      <div class="flow-line"></div>
+      <div class="flow-step">RISK_CHECKING</div>
+      <div class="flow-line"></div>
+      <div class="flow-step">APPROVAL_REQUIRED</div>
+      <div class="flow-line"></div>
+      <div class="flow-step">APPROVED</div>
+      <div class="flow-line"></div>
+      <div class="flow-step">EXECUTING</div>
+      <div class="flow-line"></div>
+      <div class="flow-step success">EXECUTED</div>
+    </div>
+  </div>
+  
+  <div class="flow-track">
+    <div class="flow-track-label">分支 — 策略拒绝</div>
+    <div class="flow-steps">
+      <div class="flow-step" style="opacity: 0.4;">RISK_CHECKING</div>
+      <div class="flow-line"></div>
+      <div class="flow-step fail">AUTO_REJECTED</div>
+      <span class="flow-branch-note">策略违规 → 终态</span>
+    </div>
+  </div>
+  
+  <div class="flow-track">
+    <div class="flow-track-label">分支 — 用户拒绝</div>
+    <div class="flow-steps">
+      <div class="flow-step" style="opacity: 0.4;">APPROVAL_REQUIRED</div>
+      <div class="flow-line"></div>
+      <div class="flow-step fail">REJECTED_BY_USER</div>
+      <span class="flow-branch-note">用户拒绝 → 终态</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>让 AI 在<em>信任的边界</em>内<br>自由行动</h2>
+  <p>权限、风险、审计三位一体。HTX Agent Passport——为 AI 代理构建可信赖的执行环境。</p>
+  <div class="cta-buttons">
+    <button class="btn-dark">开始使用 →</button>
+    <button class="btn-light">GitHub</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>HTX Agent Passport · AI Agent Control Plane</span>
+  <span>FastAPI · Next.js · PostgreSQL</span>
+</footer>
+
+</body>
+</html>

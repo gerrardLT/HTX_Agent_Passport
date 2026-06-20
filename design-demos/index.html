@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTX Agent Passport — Landing Page 设计变体</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; background: #111; color: #eee; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.wrap { max-width: 900px; padding: 48px; }
+h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.02em; }
+p { color: #888; font-size: 15px; margin-bottom: 40px; line-height: 1.6; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card { display: block; text-decoration: none; color: inherit; border: 1px solid #333; border-radius: 8px; overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
+.card:hover { border-color: #666; transform: translateY(-2px); }
+.card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; border-bottom: 1px solid #333; }
+.card-body { padding: 20px; }
+.card-tag { font-size: 11px; color: #666; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+.card-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.card-desc { font-size: 13px; color: #888; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>HTX Agent Passport · Landing Page 设计变体</h1>
+  <p>三套不同风格的视觉方案，点击卡片查看完整页面。截图仅供缩略参考，请点击进入完整 HTML 版本。</p>
+  <div class="grid">
+    <a class="card" href="variant-a-swiss-terminal.html">
+      <img src="screenshot-a.png" alt="Variant A">
+      <div class="card-body">
+        <div class="card-tag">Variant A · 秒数轮盘</div>
+        <div class="card-title">Swiss Terminal</div>
+        <div class="card-desc">瑞士排版 + 终端仿真，暖白底 + 赤橙，精密工程感</div>
+      </div>
+    </a>
+    <a class="card" href="variant-b-linear-dark.html">
+      <img src="screenshot-b.png" alt="Variant B">
+      <div class="card-body">
+        <div class="card-tag">Variant B · 现实参照</div>
+        <div class="card-title">Linear Dark</div>
+        <div class="card-desc">暗色电影感，深黑底 + 紫辉光，现代 SaaS 科技感</div>
+      </div>
+    </a>
+    <a class="card" href="variant-c-pentagram-editorial.html">
+      <img src="screenshot-c.png" alt="Variant C">
+      <div class="card-body">
+        <div class="card-tag">Variant C · 顶级设计师</div>
+        <div class="card-title">Pentagram Editorial</div>
+        <div class="card-desc">编辑式极简，大量留白 + Serif 斜体，金融级克制</div>
+      </div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

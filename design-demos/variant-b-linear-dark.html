@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTX Agent Passport — AI Agent Control Plane</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── Variant B · 现实参照：Linear.app 暗色电影感 ─── */
+/* 逻辑：以 Linear 的暗色系统 + 精致动效 + 径向光晕为标杆，迁移到安全/金融场景 */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0A0A0F;
+  --surface: #12121A;
+  --surface-2: #1A1A26;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-2: rgba(255, 255, 255, 0.12);
+  --fg: #F0F0F5;
+  --fg-2: #A0A0B0;
+  --fg-3: #606070;
+  --accent: #6E56CF;
+  --accent-glow: rgba(110, 86, 207, 0.3);
+  --green: #2DB56E;
+  --orange: #E8873A;
+  --red: #E05050;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── AMBIENT GLOW ─── */
+.glow-top {
+  position: fixed;
+  top: -300px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10, 10, 15, 0.7);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.nav-logo {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 10px;
+}
+
+.nav-logo .shield {
+  width: 22px; height: 22px;
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: var(--accent);
+  font-family: var(--mono);
+}
+
+.nav-links {
+  display: flex; gap: 28px; align-items: center;
+  font-size: 13px; font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--fg-3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--fg); }
+
+.nav-cta {
+  font-size: 13px; font-weight: 500;
+  padding: 7px 18px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.nav-cta:hover { opacity: 0.85; }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  padding: 180px 48px 140px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  z-index: 1;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  background: rgba(110, 86, 207, 0.08);
+  border: 1px solid rgba(110, 86, 207, 0.2);
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 32px;
+  letter-spacing: 0.04em;
+}
+
+.hero-badge .live-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.hero h1 {
+  font-size: clamp(52px, 6vw, 80px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  margin-bottom: 24px;
+  background: linear-gradient(180deg, #FFFFFF 40%, #808090 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero h1 span {
+  background: linear-gradient(135deg, var(--accent) 0%, #A78BFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--fg-2);
+  max-width: 580px;
+  margin: 0 auto 48px;
+  line-height: 1.75;
+}
+
+.hero-actions {
+  display: flex; gap: 12px; justify-content: center;
+}
+
+.btn-primary {
+  font-size: 14px; font-weight: 500;
+  padding: 12px 28px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 40px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  font-size: 14px; font-weight: 500;
+  padding: 12px 28px;
+  background: transparent;
+  color: var(--fg-2);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  border-color: var(--fg-3);
+  color: var(--fg);
+}
+
+/* ─── TRUST METRICS ─── */
+.trust-bar {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.trust-item {
+  text-align: center;
+}
+
+.trust-num {
+  font-family: var(--mono);
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--fg);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.trust-label {
+  font-size: 13px;
+  color: var(--fg-3);
+}
+
+/* ─── FEATURES ─── */
+.section {
+  padding: 140px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.section-eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-heading {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.section-body {
+  font-size: 16px;
+  color: var(--fg-2);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 72px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.f-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 32px;
+  transition: border-color 0.3s, background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.f-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.f-card:hover {
+  border-color: var(--border-2);
+  background: var(--surface-2);
+}
+
+.f-card:hover::before { opacity: 1; }
+
+.f-icon {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  background: rgba(110, 86, 207, 0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+
+.f-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.f-desc {
+  font-size: 14px;
+  color: var(--fg-3);
+  line-height: 1.7;
+}
+
+/* ─── SECURITY SECTION ─── */
+.security-wrap {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 140px 48px;
+  position: relative;
+  z-index: 1;
+}
+
+.security-wrap .glow-side {
+  position: absolute;
+  right: -200px; top: 50%;
+  transform: translateY(-50%);
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(224, 80, 80, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.security-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.defense-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 24px;
+}
+
+.d-layer {
+  display: grid;
+  grid-template-columns: 64px 220px 1fr;
+  gap: 32px;
+  padding: 36px 40px;
+  background: var(--bg);
+  border-radius: 12px;
+  align-items: start;
+  transition: background 0.3s;
+  border: 1px solid var(--border);
+}
+
+.d-layer:hover { background: var(--surface-2); }
+
+.d-step {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  padding-top: 4px;
+  letter-spacing: 0.06em;
+}
+
+.d-name {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.d-desc {
+  font-size: 14px;
+  color: var(--fg-3);
+  line-height: 1.7;
+}
+
+/* ─── LIFECYCLE ─── */
+.lifecycle-section {
+  padding: 140px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 48px 0;
+  overflow-x: auto;
+}
+
+.p-node {
+  padding: 10px 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg-2);
+  transition: all 0.2s;
+}
+
+.p-node.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.p-node.terminal-red {
+  background: rgba(224, 80, 80, 0.1);
+  border-color: rgba(224, 80, 80, 0.3);
+  color: var(--red);
+}
+
+.p-node.terminal-green {
+  background: rgba(45, 181, 110, 0.1);
+  border-color: rgba(45, 181, 110, 0.3);
+  color: var(--green);
+}
+
+.p-arrow {
+  padding: 0 8px;
+  color: var(--fg-3);
+  font-size: 14px;
+}
+
+.pipeline-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-3);
+  margin-top: 4px;
+  margin-bottom: 24px;
+  letter-spacing: 0.04em;
+}
+
+/* ─── CTA ─── */
+.cta-section {
+  padding: 160px 48px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+}
+
+.cta-section .glow-bottom {
+  position: absolute;
+  bottom: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.cta-heading {
+  font-size: clamp(40px, 5vw, 60px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  background: linear-gradient(180deg, #FFFFFF 30%, #808090 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cta-body {
+  font-size: 17px;
+  color: var(--fg-2);
+  margin-bottom: 48px;
+  max-width: 460px;
+  margin-left: auto; margin-right: auto;
+  line-height: 1.7;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer span {
+  font-size: 13px;
+  color: var(--fg-3);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .trust-bar { grid-template-columns: repeat(2, 1fr); }
+  .d-layer { grid-template-columns: 1fr; gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="glow-top"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span class="shield">P</span>
+    HTX Agent Passport
+  </div>
+  <div class="nav-links">
+    <a href="#features">功能</a>
+    <a href="#security">安全</a>
+    <a href="#lifecycle">流程</a>
+    <button class="nav-cta">开始使用</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="live-dot"></span>
+    AI Agent Control Plane
+  </div>
+  <h1>当 AI 操作真金白银<br>谁来确保它<span>不犯错</span></h1>
+  <p class="hero-sub">HTX Agent Passport 是面向加密货币交易的零信任执行框架。LLM 输出仅为提案，每一笔操作须经策略引擎确定性裁决后方可执行。</p>
+  <div class="hero-actions">
+    <button class="btn-primary">进入控制台 →</button>
+    <button class="btn-outline">查看文档</button>
+  </div>
+</section>
+
+<!-- TRUST METRICS -->
+<div class="trust-bar">
+  <div class="trust-item">
+    <div class="trust-num">3</div>
+    <div class="trust-label">纵深安全防线</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-num">7 步</div>
+    <div class="trust-label">确定性策略裁决</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-num">100%</div>
+    <div class="trust-label">操作可审计追溯</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-num">Zero</div>
+    <div class="trust-label">密钥明文暴露</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-eyebrow">Core Capabilities</div>
+  <h2 class="section-heading">不只是工具<br>是信任基础设施</h2>
+  <p class="section-body">五个核心能力构建端到端的安全执行链路——从意图感知到策略裁决，从审批兜底到审计追溯。</p>
+  
+  <div class="features-grid">
+    <div class="f-card">
+      <div class="f-icon">⊘</div>
+      <div class="f-title">零信任执行</div>
+      <div class="f-desc">LLM 的输出仅是一份提案。任何操作都必须经过 Policy Engine 的七步确定性裁决，杜绝 AI 幻觉带来的资金风险。</div>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">⧫</div>
+      <div class="f-title">信封加密</div>
+      <div class="f-desc">API 密钥通过 Vault 主密钥加密存储，运行时解密、用后即焚。密钥从不以明文出现在数据库或日志中。</div>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">⌬</div>
+      <div class="f-title">Merkle 审计链</div>
+      <div class="f-desc">每一次状态变更、策略裁决、执行结果都记录为审计事件，形成哈希链 + 定期 STH 锚定，可验证不可篡改。</div>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">☰</div>
+      <div class="f-title">人工审批兜底</div>
+      <div class="f-desc">高危操作自动触发 HITL 审批流程。用户可通过前端确认或拒绝，超时自动过期。</div>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">◎</div>
+      <div class="f-title">策略热更新</div>
+      <div class="f-desc">Passport 策略支持运行时调整——单笔限额、日累计限额、允许币种均可实时配置，无需重启。</div>
+    </div>
+    <div class="f-card">
+      <div class="f-icon">⟁</div>
+      <div class="f-title">Stale Price 防护</div>
+      <div class="f-desc">审批到执行之间若市场剧烈波动，执行网关自动检测价格偏离度，超过阈值时阻断执行。</div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section class="security-wrap" id="security">
+  <div class="glow-side"></div>
+  <div class="security-inner">
+    <div class="section-eyebrow">Defense in Depth</div>
+    <h2 class="section-heading">三道纵深防线</h2>
+    <p class="section-body">每一层独立运作、互为冗余。即使某一层失效，后续层仍能拦截风险。</p>
+    
+    <div class="defense-layers">
+      <div class="d-layer">
+        <div class="d-step">L-01</div>
+        <div class="d-name">规则路由拦截</div>
+        <div class="d-desc">基于关键词和语义的第一道过滤——提现、借贷、跨链转账等高危意图在进入 AI 规划前即被硬拦截。</div>
+      </div>
+      <div class="d-layer">
+        <div class="d-step">L-02</div>
+        <div class="d-name">Policy Engine 裁决</div>
+        <div class="d-desc">纯函数策略引擎，对操作计划执行七步确定性检查：金额、币种、日限额、风险评分、幂等性。</div>
+      </div>
+      <div class="d-layer">
+        <div class="d-step">L-03</div>
+        <div class="d-name">执行网关校验</div>
+        <div class="d-desc">审批后、执行前的最终安全门——聚合当日真实累计、检测市场价格偏离、验证幂等性，然后才调用交易 API。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIFECYCLE -->
+<section class="lifecycle-section" id="lifecycle">
+  <div class="section-eyebrow">Action Lifecycle</div>
+  <h2 class="section-heading">每一步都有据可查</h2>
+  <p class="section-body">Action 从请求到终态的完整生命周期，所有状态转换均经审计事件记录。</p>
+  
+  <div class="pipeline-label">// 主路径 — 成功执行</div>
+  <div class="pipeline">
+    <div class="p-node active">REQUESTED</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node">PLANNING</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node">PLAN_VALIDATED</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node">RISK_CHECKING</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node">APPROVAL_REQUIRED</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node">APPROVED</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node">EXECUTING</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node terminal-green">EXECUTED</div>
+  </div>
+  
+  <div class="pipeline-label">// 分支 — 策略拒绝</div>
+  <div class="pipeline">
+    <div class="p-node" style="opacity: 0.4;">RISK_CHECKING</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node terminal-red">AUTO_REJECTED</div>
+    <span style="font-family: var(--mono); font-size: 12px; color: var(--fg-3); margin-left: 16px;">策略违规 → 终态</span>
+  </div>
+  
+  <div class="pipeline-label" style="margin-top: 16px;">// 分支 — 用户拒绝</div>
+  <div class="pipeline">
+    <div class="p-node" style="opacity: 0.4;">APPROVAL_REQUIRED</div>
+    <div class="p-arrow">→</div>
+    <div class="p-node terminal-red">REJECTED_BY_USER</div>
+    <span style="font-family: var(--mono); font-size: 12px; color: var(--fg-3); margin-left: 16px;">用户拒绝 → 终态</span>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="glow-bottom"></div>
+  <h2 class="cta-heading">让 AI 在信任的边界内<br>自由行动</h2>
+  <p class="cta-body">权限、风险、审计三位一体，为 AI 代理构建可信赖的执行环境。</p>
+  <div class="hero-actions" style="justify-content: center;">
+    <button class="btn-primary">开始使用 →</button>
+    <button class="btn-outline">GitHub</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>HTX Agent Passport · AI Agent Control Plane</span>
+  <span>FastAPI · Next.js · PostgreSQL</span>
+</footer>
+
+</body>
+</html>

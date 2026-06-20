@@ -1,0 +1,111 @@
+# =============================================================================
+# 通用
+# =============================================================================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.pid
+
+# 真实环境变量（绝不入库）；保留 .env.example
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# =============================================================================
+# IDE / 编辑器
+# =============================================================================
+.idea/
+.vscode/
+*.iml
+*.code-workspace
+
+# =============================================================================
+# Python (backend)
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# 虚拟环境
+.venv/
+venv/
+env/
+ENV/
+
+# 测试 / 覆盖率 / 类型检查缓存
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+.tox/
+
+# Alembic 临时
+backend/alembic/versions/__pycache__/
+
+# =============================================================================
+# Node / Next.js (frontend)
+# =============================================================================
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Next.js 构建产物
+.next/
+out/
+next-env.d.ts.bak
+
+# 包管理器日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vercel
+.vercel
+
+# 测试
+coverage/
+.nyc_output/
+
+# TypeScript 增量缓存
+*.tsbuildinfo
+
+# =============================================================================
+# Docker / 数据卷
+# =============================================================================
+# 仅忽略本地数据库快照（实际数据卷由 docker 管理，不在仓库内）
+docker-data/
+*.dump
+*.sql.bak
+
+# =============================================================================
+# Design demos（截图和临时产物）
+# =============================================================================
+design-demos/*.png
+design-demos/*.mjs
+
+# IDE / 工具
+.kiro/
+.tmp-skills-repo/
+
+# 开发临时文件
+backend/action_id.txt
+backend/passport_id.txt
+backend/local_dev.db
+frontend/test-results/
+frontend/screenshot.mjs

@@ -1,0 +1,103 @@
+# =============================================================================
+# HTX Agent Passport — 生产部署（docker-compose.prod.yml）
+#
+# 架构：Nginx(80) → Frontend(3000) + Backend(8000) → PostgreSQL(5432)
+#
+# 使用方式：
+#   1. 复制 .env.prod 并填写真实密钥
+#   2. docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+#   3. 访问 http://your-server-ip
+#
+# 停止：docker compose -f docker-compose.prod.yml down
+# 查看日志：docker compose -f docker-compose.prod.yml logs -f
+# =============================================================================
+
+services:
+  # ─── PostgreSQL 数据库 ────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: htx_passport_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-htx_agent_passport}
+      POSTGRES_USER: ${POSTGRES_USER:-htx_agent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-htx_agent} -d ${POSTGRES_DB:-htx_agent_passport}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  # ─── 后端 API（FastAPI + Uvicorn）────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: htx_passport_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-htx_agent}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-htx_agent_passport}
+      VAULT_MASTER_KEY: ${VAULT_MASTER_KEY}
+      VAULT_KEY_PROVIDER: ${VAULT_KEY_PROVIDER:-local}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRE_HOURS: 24
+      DEMO_MODE: ${DEMO_MODE:-true}
+      DEMO_REAL_TRADE: ${DEMO_REAL_TRADE:-false}
+      DEMO_DISABLE_EXECUTION: ${DEMO_DISABLE_EXECUTION:-false}
+      GENESIS_HASH: HTX_AGENT_PASSPORT_GENESIS_V1
+      AUDIT_STH_ENABLED: 'false'
+      BAI_API_KEY: ${BAI_API_KEY:-}
+      BAI_API_URL: ${BAI_API_URL:-https://api.b.ai/v1}
+      BAI_MODEL: ${BAI_MODEL:-deepseek-v4-flash}
+      BAI_TIMEOUT_SECONDS: 30
+      BAI_MAX_RETRIES: 2
+      HTX_API_URL: ${HTX_API_URL:-https://api.huobi.pro}
+      CORS_ORIGINS: '["http://localhost", "http://localhost:80"]'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # ─── 前端（Next.js 14 standalone）────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: /api
+        NEXT_PUBLIC_EXECUTION_MODE: ${NEXT_PUBLIC_EXECUTION_MODE:-SIMULATION}
+    container_name: htx_passport_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+  # ─── Nginx 反向代理 ──────────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: htx_passport_nginx
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - internal
+
+volumes:
+  pgdata:
+    name: htx_passport_pgdata
+
+networks:
+  internal:
+    name: htx_passport_net

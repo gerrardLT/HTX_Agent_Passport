@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1440" />
+  <title>HTX Agent Passport — Dashboard (版A: Glassmorphism Bento)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg:#08090A; --card:rgba(255,255,255,.04); --card-h:rgba(255,255,255,.06);
+      --bdr:rgba(255,255,255,.06); --brand:#5E6AD2; --brand-s:rgba(94,106,210,.15);
+      --gs:#4EA7FC; --ge:#B59AFF; --t1:#F1F1F3; --t2:rgba(255,255,255,.55); --t3:rgba(255,255,255,.32);
+      --green:#34D399; --gg:rgba(52,211,153,.2); --amber:#FBBF24; --ag:rgba(251,191,36,.18);
+      --red:#F87171; --rg:rgba(248,113,113,.18); --gt:rgba(255,255,255,.12);
+    }
+    html { font-family:'Inter',sans-serif; font-size:14px; color:var(--t1); background:var(--bg); letter-spacing:-.02em; -webkit-font-smoothing:antialiased; }
+    body { min-height:100vh; background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(78,167,252,.07) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 80% 20%,rgba(181,154,255,.05) 0%,transparent 50%),var(--bg); }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fade{from{opacity:0}to{opacity:1}}
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    @keyframes glow{0%,100%{box-shadow:0 0 8px var(--gg)}50%{box-shadow:0 0 14px var(--gg)}}
+    .pw{max-width:1440px;margin:0 auto;padding:0 48px 60px}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 48px;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100;background:rgba(8,9,10,.75);backdrop-filter:blur(24px);animation:fade .6s ease}
+    .nav-l{display:flex;align-items:center;gap:36px}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;color:var(--t1);text-decoration:none}
+    .nav-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--gs),var(--ge));display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(78,167,252,.25)}
+    .nav-links{display:flex;gap:4px}
+    .nl{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--t2);text-decoration:none;transition:all .2s}
+    .nl:hover{color:var(--t1);background:rgba(255,255,255,.04)}
+    .nl.on{color:var(--t1);background:var(--brand-s)}
+    .nav-r{display:flex;align-items:center;gap:12px}
+    .demo{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gs);background:rgba(78,167,252,.1);border:1px solid rgba(78,167,252,.18)}
+    .logout{padding:6px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--t2);background:0 0;border:1px solid var(--bdr);cursor:pointer;font-family:inherit;transition:all .2s}
+    .logout:hover{color:var(--red);border-color:rgba(248,113,113,.25)}
+    .hdr{padding:36px 0 8px;animation:fadeUp .6s ease .1s both}
+    .hdr h1{font-size:26px;font-weight:700;background:linear-gradient(135deg,var(--t1) 40%,var(--ge));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hdr p{margin-top:6px;font-size:13.5px;color:var(--t2)}
+    .bg{display:grid;gap:16px}
+    .sr{grid-template-columns:1fr 1fr 1fr;margin-top:28px;animation:fadeUp .6s ease .2s both}
+    .ps{grid-template-columns:1fr;margin-top:20px;animation:fadeUp .6s ease .3s both}
+    .qr{grid-template-columns:repeat(4,1fr);margin-top:20px;animation:fadeUp .6s ease .45s both}
+    .gc{position:relative;background:var(--card);border:1px solid var(--bdr);border-radius:16px;backdrop-filter:blur(12px);transition:all .35s cubic-bezier(.4,0,.2,1);overflow:hidden}
+    .gc::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 50%,rgba(255,255,255,.03));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.6;transition:opacity .35s}
+    .gc:hover{background:var(--card-h);border-color:rgba(94,106,210,.18);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3),0 0 0 1px rgba(94,106,210,.1)}
+    .gc:hover::before{opacity:1}
+    .sc{padding:22px 24px;display:flex;flex-direction:column;gap:12px}
+    .sc-h{display:flex;align-items:center;justify-content:space-between}
+    .sl{font-size:12px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:.04em}
+    .si{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+    .sv{font-size:28px;font-weight:700;line-height:1}
+    .sv.m{font-size:18px;font-weight:600;letter-spacing:.02em}
+    .ss{font-size:12px;color:var(--t3)}
+    .sch{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--green);background:rgba(52,211,153,.08);padding:2px 7px;border-radius:6px}
+    .ico{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .ico.s{width:14px;height:14px}.ico.l{width:22px;height:22px}
+    .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .st{font-size:16px;font-weight:600}
+    .sa{font-size:12.5px;font-weight:500;color:var(--brand);text-decoration:none;display:flex;align-items:center;gap:4px}
+    .plw{padding:24px}
+    .plg{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .pc{padding:20px;display:flex;flex-direction:column;gap:14px;cursor:pointer}
+    .pc-t{display:flex;align-items:flex-start;justify-content:space-between}
+    .av{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .av.t{background:linear-gradient(135deg,rgba(78,167,252,.18),rgba(94,106,210,.12))}
+    .av.d{background:linear-gradient(135deg,rgba(181,154,255,.18),rgba(94,106,210,.1))}
+    .av.c{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(248,113,113,.08))}
+    .av.r{background:linear-gradient(135deg,rgba(248,113,113,.15),rgba(181,154,255,.08))}
+    .pi{flex:1;margin-left:14px}
+    .pn{font-size:14px;font-weight:600;margin-bottom:3px}
+    .pt{font-size:12px;color:var(--t3);font-weight:500}
+    .tg{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600}
+    .dot{width:6px;height:6px;border-radius:50%}
+    .tg.a{color:var(--green);background:var(--gg);border:1px solid rgba(52,211,153,.18);animation:glow 3s ease-in-out infinite}
+    .tg.a .dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+    .tg.p{color:var(--amber);background:var(--ag);border:1px solid rgba(251,191,36,.15)}
+    .tg.p .dot{background:var(--amber)}
+    .tg.dr{color:var(--t2);background:var(--gt);border:1px solid rgba(255,255,255,.06)}
+    .tg.dr .dot{background:var(--t2)}
+    .tg.rv{color:var(--red);background:var(--rg);border:1px solid rgba(248,113,113,.15)}
+    .tg.rv .dot{background:var(--red)}
+    .rbw{display:flex;align-items:center;gap:12px}
+    .rl{font-size:11px;color:var(--t3);min-width:36px}
+    .rb{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+    .rf{height:100%;border-radius:3px;position:relative}
+    .rf::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);background-size:200% 100%;animation:shimmer 3s ease-in-out infinite}
+    .rf.h{background:linear-gradient(90deg,var(--green),var(--gs))}
+    .rf.mi{background:linear-gradient(90deg,var(--gs),var(--brand))}
+    .rf.lo{background:linear-gradient(90deg,var(--amber),#E879A0)}
+    .rf.vl{background:linear-gradient(90deg,var(--red),#C084FC)}
+    .rs{font-size:13px;font-weight:700;min-width:28px;text-align:right}
+    .rs.h{color:var(--green)}.rs.mi{color:var(--gs)}.rs.lo{color:var(--amber)}.rs.vl{color:var(--red)}
+    .pf{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--bdr)}
+    .pm{font-size:11px;color:var(--t3)}
+    .qc{padding:22px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;cursor:pointer;min-height:150px;justify-content:center}
+    .qi{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;transition:transform .3s,box-shadow .3s}
+    .gc:hover .qi{transform:scale(1.08)}
+    .qi.c1{background:linear-gradient(135deg,rgba(78,167,252,.18),rgba(94,106,210,.14))}
+    .qi.c2{background:linear-gradient(135deg,rgba(94,106,210,.2),rgba(181,154,255,.14))}
+    .qi.c3{background:linear-gradient(135deg,rgba(52,211,153,.18),rgba(78,167,252,.12))}
+    .qi.c4{background:linear-gradient(135deg,rgba(251,191,36,.14),rgba(248,113,113,.1))}
+    .qt{font-size:13.5px;font-weight:600}
+    .qd{font-size:12px;color:var(--t3);line-height:1.5}
+    .orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0}
+    .orb.a{width:400px;height:400px;top:-120px;right:-80px;background:rgba(78,167,252,.04)}
+    .orb.b{width:300px;height:300px;bottom:-100px;left:-60px;background:rgba(181,154,255,.035)}
+    .wm{text-align:center;padding:40px 0 20px;font-size:11px;color:var(--t3);animation:fade .8s ease .6s both}
+    .wm span{background:linear-gradient(90deg,var(--gs),var(--ge));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:600}
+  </style>
+</head>
+<body>
+<div class="orb a"></div><div class="orb b"></div>
+<nav class="nav">
+  <div class="nav-l">
+    <a href="#" class="nav-brand"><div class="nav-logo"><svg viewBox="0 0 24 24" style="stroke:#fff;stroke-width:1.8;fill:none;width:14px;height:14px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>HTX Agent Passport</a>
+    <div class="nav-links"><a href="#" class="nl on">仪表盘</a><a href="#" class="nl">凭证管理</a><a href="#" class="nl">代理护照</a><a href="#" class="nl">预设场景</a><a href="#" class="nl">审计</a></div>
+  </div>
+  <div class="nav-r"><div class="demo">DEMO</div><button class="logout">退出登录</button></div>
+</nav>
+<div class="pw">
+  <div class="hdr"><h1>控制台概览</h1><p>管理 AI 代理护照、凭证与权限策略 — 实时监控代理信誉与行为</p></div>
+  <div class="bg sr">
+    <div class="gc sc"><div class="sc-h"><span class="sl">钱包地址</span><div class="si" style="background:linear-gradient(135deg,rgba(78,167,252,.15),rgba(181,154,255,.15))"><svg class="ico" viewBox="0 0 24 24" style="color:var(--gs)"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div></div><div class="sv m">0xA11C···0001</div><div class="ss">已连接 · MetaMask</div></div>
+    <div class="gc sc"><div class="sc-h"><span class="sl">护照总数</span><div class="si" style="background:linear-gradient(135deg,rgba(94,106,210,.18),rgba(181,154,255,.12))"><svg class="ico" viewBox="0 0 24 24" style="color:var(--brand)"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 12h6"/><path d="M9 8h6"/></svg></div></div><div class="sv">7</div><div class="ss"><span class="sch">↑ +2 本月</span></div></div>
+    <div class="gc sc"><div class="sc-h"><span class="sl">活跃护照</span><div class="si" style="background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(78,167,252,.1))"><svg class="ico" viewBox="0 0 24 24" style="color:var(--green)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div></div><div class="sv">4</div><div class="ss">较上周持平</div></div>
+  </div>
+  <div class="bg ps">
+    <div class="gc plw">
+      <div class="sh"><div class="st">代理护照</div><a href="#" class="sa">查看全部 →</a></div>
+      <div class="plg">
+        <div class="gc pc" style="animation:fadeUp .5s ease .35s both"><div class="pc-t"><div style="display:flex;align-items:center"><div class="av t"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--gs)"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div><div class="pi"><div class="pn">DeFi 套利代理 Alpha</div><div class="pt">trading-bot</div></div></div><div class="tg a"><span class="dot"></span>活跃</div></div><div class="rbw"><span class="rl">声誉</span><div class="rb"><div class="rf h" style="width:87%"></div></div><span class="rs h">87</span></div><div class="pf"><span class="pm">最后活跃 · 2 分钟前</span></div></div>
+        <div class="gc pc" style="animation:fadeUp .5s ease .42s both"><div class="pc-t"><div style="display:flex;align-items:center"><div class="av d"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--ge)"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div><div class="pi"><div class="pn">市场数据聚合器</div><div class="pt">data-agent</div></div></div><div class="tg p"><span class="dot"></span>暂停</div></div><div class="rbw"><span class="rl">声誉</span><div class="rb"><div class="rf mi" style="width:62%"></div></div><span class="rs mi">62</span></div><div class="pf"><span class="pm">最后活跃 · 3 小时前</span></div></div>
+        <div class="gc pc" style="animation:fadeUp .5s ease .49s both"><div class="pc-t"><div style="display:flex;align-items:center"><div class="av c"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--amber)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="pi"><div class="pn">新闻摘要代理</div><div class="pt">content-bot</div></div></div><div class="tg dr"><span class="dot"></span>草稿</div></div><div class="rbw"><span class="rl">声誉</span><div class="rb"><div class="rf lo" style="width:45%"></div></div><span class="rs lo">45</span></div><div class="pf"><span class="pm">创建于 · 1 天前</span></div></div>
+        <div class="gc pc" style="animation:fadeUp .5s ease .56s both"><div class="pc-t"><div style="display:flex;align-items:center"><div class="av r"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--red)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="pi"><div class="pn">风控监控代理</div><div class="pt">risk-monitor</div></div></div><div class="tg rv"><span class="dot"></span>已撤销</div></div><div class="rbw"><span class="rl">声誉</span><div class="rb"><div class="rf vl" style="width:31%"></div></div><span class="rs vl">31</span></div><div class="pf"><span class="pm">撤销于 · 5 天前</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bg qr">
+    <div class="gc qc"><div class="qi c1"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--gs)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="qt">凭证管理</div><div class="qd">管理 API 密钥与访问凭证</div></div>
+    <div class="gc qc"><div class="qi c2"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--brand)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="qt">代理护照</div><div class="qd">查看与配置代理权限策略</div></div>
+    <div class="gc qc"><div class="qi c3"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--green)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div class="qt">创建护照</div><div class="qd">为新代理签发权限护照</div></div>
+    <div class="gc qc"><div class="qi c4"><svg class="ico l" viewBox="0 0 24 24" style="color:var(--amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="qt">预设场景</div><div class="qd">快速体验典型代理工作流</div></div>
+  </div>
+  <div class="wm"><span>HTX Agent Passport</span> · HTX Genesis Hackathon 2026</div>
+</div>
+</body>
+</html>

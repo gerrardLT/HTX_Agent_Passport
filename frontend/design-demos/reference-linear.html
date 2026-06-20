@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>HTX Agent Passport — Dashboard (版B: Linear 参照)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0B0E;--s0:#111216;--s1:#1C1D21;--s2:#232429;--s3:#2C2D31;
+  --hov:rgba(255,255,255,.04);--act:rgba(255,255,255,.06);
+  --brand:#5E6AD2;--bd:rgba(94,106,210,.15);--bg2:rgba(94,106,210,.08);
+  --t1:#F4F4F5;--t2:#A0A3AB;--t3:#6B6F76;--t4:#4A4D54;
+  --brd:rgba(255,255,255,.06);--brd2:rgba(255,255,255,.08);--brdh:rgba(255,255,255,.12);
+  --green:#4CB782;--gbg:rgba(76,183,130,.12);
+  --yellow:#E8B84C;--ybg:rgba(232,184,76,.12);
+  --red:#E85D5D;--rbg:rgba(232,93,93,.12);
+  --gray:#6B6F76;--grbg:rgba(107,111,118,.12);
+  --sw:240px;--rs:6px;--rm:8px;--rl:12px;
+}
+html{font-size:14px;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t1);line-height:1.5;letter-spacing:-.01em;min-height:100vh}
+.shell{display:flex;min-height:100vh}
+
+/* Sidebar */
+.side{width:var(--sw);min-width:var(--sw);background:var(--s0);border-right:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.side-h{padding:20px 16px 16px;display:flex;align-items:center;gap:10px}
+.side-logo{width:28px;height:28px;background:linear-gradient(135deg,var(--brand),#8B7CF6);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.side-logo::after{content:'';width:10px;height:10px;border:2px solid rgba(255,255,255,.9);border-radius:2px;transform:rotate(45deg)}
+.side-brand{font-size:14px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.side-brand small{display:block;font-size:11px;font-weight:500;color:var(--t3);letter-spacing:0;margin-top:1px}
+.sn{padding:4px 8px;margin-top:4px}
+.sn-l{font-size:11px;font-weight:500;color:var(--t4);text-transform:uppercase;letter-spacing:.04em;padding:8px 8px 6px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--rs);color:var(--t2);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none;position:relative}
+.ni:hover{background:var(--hov);color:var(--t1)}
+.ni.on{background:var(--act);color:var(--t1)}
+.ni.on::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--brand);border-radius:0 3px 3px 0}
+.ni svg{width:16px;height:16px;opacity:.6;flex-shrink:0}
+.ni.on svg,.ni:hover svg{opacity:1}
+
+/* Sidebar footer */
+.sf{margin-top:auto;padding:12px;border-top:1px solid var(--brd)}
+.su{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--rs);cursor:pointer;transition:background .15s}
+.su:hover{background:var(--hov)}
+.ua{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.ui{flex:1;min-width:0}
+.un{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ur{font-size:11px;color:var(--t3)}
+.lo{width:24px;height:24px;border-radius:4px;cursor:pointer;opacity:0;transition:all .15s;background:none;border:none;display:flex;align-items:center;justify-content:center;color:var(--t3)}
+.su:hover .lo{opacity:1}
+
+/* Main */
+.main{margin-left:var(--sw);flex:1}
+.top{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(10,11,14,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--brd)}
+.tl{display:flex;align-items:center;gap:12px}
+.tt{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.tb{font-size:12px;color:var(--t3)}
+.tb span{color:var(--t2)}
+.tr{display:flex;align-items:center;gap:12px}
+.eb{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bd);color:var(--brand);font-size:11px;font-weight:600;letter-spacing:.06em;border-radius:999px;text-transform:uppercase}
+.eb::before{content:'';width:6px;height:6px;background:var(--brand);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sb{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s1);border:1px solid var(--brd2);border-radius:var(--rs);color:var(--t3);font-size:12px;font-family:inherit;cursor:pointer;transition:all .15s}
+.sb:hover{border-color:var(--brdh);color:var(--t2)}
+.sb kbd{font-size:10px;padding:1px 4px;background:var(--s3);border-radius:3px;color:var(--t4)}
+
+/* Page */
+.pb{padding:40px 48px 80px;max-width:1120px}
+.ph{margin-bottom:40px;position:relative}
+.ph::before{content:'';position:absolute;top:-40px;left:-48px;right:-48px;height:200px;background:radial-gradient(ellipse 60% 50% at 30% 0%,var(--bg2),transparent);pointer-events:none}
+.ph h1{font-size:28px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:8px}
+.ph p{font-size:14px;color:var(--t3);line-height:1.6;max-width:560px}
+
+/* Section */
+.sec{margin-bottom:48px;animation:fadeUp .4s ease both}
+.sec:nth-child(1){animation-delay:.05s}.sec:nth-child(2){animation-delay:.1s}.sec:nth-child(3){animation-delay:.15s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sech{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+.sect{font-size:16px;font-weight:600;letter-spacing:-.02em}
+.secd{font-size:12.5px;color:var(--t3);margin-left:12px}
+.seca{font-size:12px;color:var(--brand);font-weight:500;cursor:pointer;text-decoration:none}
+
+/* Stats */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.scard{background:var(--s1);border:1px solid var(--brd);border-radius:var(--rl);padding:20px 24px;position:relative;overflow:hidden;transition:all .2s}
+.scard:hover{border-color:var(--brdh);background:var(--s2);transform:translateY(-1px);box-shadow:0 4px 24px rgba(0,0,0,.2)}
+.scard::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--bg2),transparent);opacity:0;transition:opacity .3s}
+.scard:hover::after{opacity:1}
+.scl{font-size:12px;font-weight:500;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.scl svg{width:14px;height:14px;opacity:.5}
+.scv{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.scv.m{font-size:18px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.02em;color:var(--t2)}
+.scm{font-size:11.5px;color:var(--t4);margin-top:8px}
+.scm .dot{display:inline-block;width:4px;height:4px;background:var(--green);border-radius:50%;margin:0 6px;vertical-align:middle}
+
+/* Passport List */
+.pl{background:var(--s0);border:1px solid var(--brd);border-radius:var(--rl);overflow:hidden}
+.plh{display:grid;grid-template-columns:2fr 1fr 100px 160px;padding:10px 20px;border-bottom:1px solid var(--brd);background:var(--s1)}
+.plh span{font-size:11px;font-weight:500;color:var(--t4);text-transform:uppercase;letter-spacing:.04em}
+.pr{display:grid;grid-template-columns:2fr 1fr 100px 160px;padding:14px 20px;align-items:center;border-bottom:1px solid var(--brd);cursor:pointer;transition:all .12s}
+.pr:last-child{border-bottom:none}
+.pr:hover{background:var(--hov)}
+.pr:hover .pn{color:var(--brand)}
+.pnc{display:flex;align-items:center;gap:12px}
+.pic{width:32px;height:32px;border-radius:var(--rm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.pic.t{background:linear-gradient(135deg,rgba(76,183,130,.2),rgba(76,183,130,.05));color:var(--green)}
+.pic.d{background:linear-gradient(135deg,rgba(94,106,210,.2),rgba(94,106,210,.05));color:var(--brand)}
+.pic.c{background:linear-gradient(135deg,rgba(232,184,76,.2),rgba(232,184,76,.05));color:var(--yellow)}
+.pic.r{background:linear-gradient(135deg,rgba(232,93,93,.2),rgba(232,93,93,.05));color:var(--red)}
+.pn{font-size:13.5px;font-weight:500;letter-spacing:-.01em;transition:color .15s}
+.pid{font-size:11px;color:var(--t4);margin-top:2px;font-variant-numeric:tabular-nums}
+.pty{font-size:12px;color:var(--t2);font-variant-numeric:tabular-nums}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:999px;font-size:11.5px;font-weight:500;width:fit-content}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%}
+.badge.a{background:var(--gbg);color:var(--green)}.badge.a::before{background:var(--green)}
+.badge.p{background:var(--ybg);color:var(--yellow)}.badge.p::before{background:var(--yellow)}
+.badge.dr{background:var(--grbg);color:var(--gray)}.badge.dr::before{background:var(--gray)}
+.badge.rv{background:var(--rbg);color:var(--red)}.badge.rv::before{background:var(--red)}
+.rc{display:flex;align-items:center;gap:10px}
+.rbg{flex:1;height:4px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}
+.rf{height:100%;border-radius:999px}
+.rf.h{background:var(--green)}.rf.mi{background:var(--yellow)}.rf.lo{background:var(--red)}
+.rsc{font-size:12px;font-weight:600;color:var(--t2);font-variant-numeric:tabular-nums;min-width:24px;text-align:right}
+
+/* Quick */
+.qg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.qc{background:var(--s1);border:1px solid var(--brd);border-radius:var(--rl);padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;text-decoration:none}
+.qc:hover{border-color:var(--brdh);background:var(--s2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.24)}
+.qi{width:36px;height:36px;border-radius:var(--rm);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.qi.pu{background:var(--bd);color:var(--brand)}
+.qi.bl{background:rgba(59,130,246,.12);color:#60A5FA}
+.qi.gn{background:rgba(76,183,130,.12);color:var(--green)}
+.qi.am{background:rgba(232,184,76,.12);color:var(--yellow)}
+.qi svg{width:18px;height:18px}
+.qct{font-size:13.5px;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
+.qcd{font-size:12px;color:var(--t3);line-height:1.5}
+.qca{position:absolute;right:16px;top:50%;transform:translateY(-50%) translateX(4px);opacity:0;transition:all .2s;color:var(--t3);font-size:16px}
+.qc:hover .qca{opacity:1;transform:translateY(-50%) translateX(0)}
+
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:999px}
+::selection{background:rgba(94,106,210,.3);color:#fff}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="side-h"><div class="side-logo"></div><div class="side-brand">Agent Passport<small>HTX Genesis</small></div></div>
+    <nav class="sn">
+      <div class="sn-l">主菜单</div>
+      <a class="ni on" href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>仪表盘</a>
+      <a class="ni" href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="10" height="8" rx="1.5"/><circle cx="8" cy="5" r="2.5"/></svg>凭证管理</a>
+      <a class="ni" href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1.5" width="12" height="13" rx="2"/><circle cx="8" cy="6.5" r="2"/></svg>代理护照</a>
+      <a class="ni" href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2v12"/><path d="M4 4h6l3 3-3 3H4"/></svg>预设场景</a>
+      <a class="ni" href="#"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z"/><path d="M6 6h4"/><path d="M6 8.5h4"/></svg>审计日志</a>
+    </nav>
+    <div class="sf"><div class="su"><div class="ua">A1</div><div class="ui"><div class="un">Admin</div><div class="ur">管理员</div></div><button class="lo" title="退出">↗</button></div></div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div class="tl"><div class="tt">仪表盘</div><div class="tb">HTX Agent Passport <span>/ 概览</span></div></div>
+      <div class="tr"><button class="sb"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>搜索…<kbd>⌘K</kbd></button><div class="eb">DEMO</div></div>
+    </header>
+    <div class="pb">
+      <div class="ph"><h1>控制平面概览</h1><p>管理 AI 代理的身份护照、权限凭证与风险审计。所有代理的操作行为均经过策略引擎校验并记录于不可篡改的审计链。</p></div>
+
+      <div class="sec">
+        <div class="sech"><div style="display:flex;align-items:baseline"><h2 class="sect">数据概览</h2><span class="secd">当前钱包下的代理护照统计</span></div></div>
+        <div class="sg">
+          <div class="scard"><div class="scl"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="3" width="13" height="10" rx="2"/><path d="M1.5 7h13"/></svg>当前钱包地址</div><div class="scv m">0xA11C···0001</div><div class="scm">已连接<span class="dot"></span>主网环境</div></div>
+          <div class="scard"><div class="scl"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1.5" width="12" height="13" rx="2"/><path d="M5 5h6"/></svg>护照总数</div><div class="scv">7</div><div class="scm">较上周 +2</div></div>
+          <div class="scard"><div class="scl"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>活跃护照</div><div class="scv">4</div><div class="scm"><span style="color:var(--green)">↑ 1</span> 较昨日</div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sech"><div style="display:flex;align-items:baseline"><h2 class="sect">代理护照</h2><span class="secd">已签发的 AI 代理身份与权限护照</span></div><a class="seca" href="#">查看全部 →</a></div>
+        <div class="pl">
+          <div class="plh"><span>名称</span><span>代理类型</span><span>状态</span><span>声誉分</span></div>
+          <div class="pr"><div class="pnc"><div class="pic t">⚡</div><div><div class="pn">DeFi 套利代理 Alpha</div><div class="pid">PPT-2026-0041</div></div></div><div class="pty">trading-bot</div><div><span class="badge a">活跃</span></div><div class="rc"><div class="rbg"><div class="rf h" style="width:87%"></div></div><span class="rsc">87</span></div></div>
+          <div class="pr"><div class="pnc"><div class="pic d">◈</div><div><div class="pn">市场数据聚合器</div><div class="pid">PPT-2026-0038</div></div></div><div class="pty">data-agent</div><div><span class="badge p">暂停</span></div><div class="rc"><div class="rbg"><div class="rf mi" style="width:62%"></div></div><span class="rsc">62</span></div></div>
+          <div class="pr"><div class="pnc"><div class="pic c">✦</div><div><div class="pn">新闻摘要代理</div><div class="pid">PPT-2026-0045</div></div></div><div class="pty">content-bot</div><div><span class="badge dr">草稿</span></div><div class="rc"><div class="rbg"><div class="rf mi" style="width:45%"></div></div><span class="rsc">45</span></div></div>
+          <div class="pr"><div class="pnc"><div class="pic r">◉</div><div><div class="pn">风控监控代理</div><div class="pid">PPT-2026-0029</div></div></div><div class="pty">risk-monitor</div><div><span class="badge rv">已撤销</span></div><div class="rc"><div class="rbg"><div class="rf lo" style="width:31%"></div></div><span class="rsc">31</span></div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sech"><div style="display:flex;align-items:baseline"><h2 class="sect">快捷入口</h2><span class="secd">常用功能快速导航</span></div></div>
+        <div class="qg">
+          <a class="qc" href="#"><div class="qi bl"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="10" height="8" rx="1.5"/><circle cx="8" cy="5" r="2.5"/></svg></div><div class="qct">凭证管理</div><div class="qcd">查看和管理 API 密钥、Token 等访问凭证的生命周期</div><span class="qca">→</span></a>
+          <a class="qc" href="#"><div class="qi pu"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1.5" width="12" height="13" rx="2"/><circle cx="8" cy="6.5" r="2"/></svg></div><div class="qct">代理护照</div><div class="qcd">浏览所有已签发的代理身份护照，管理权限与策略</div><span class="qca">→</span></a>
+          <a class="qc" href="#"><div class="qi gn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v6"/><path d="M5 8h6"/></svg></div><div class="qct">创建护照</div><div class="qcd">为新的 AI 代理签发身份护照，配置操作权限边界</div><span class="qca">→</span></a>
+          <a class="qc" href="#"><div class="qi am"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2v12"/><path d="M4 4h6l3 3-3 3H4"/></svg></div><div class="qct">预设场景</div><div class="qcd">快速体验 DeFi 套利、风控审计等预设演示场景</div><span class="qca">→</span></a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

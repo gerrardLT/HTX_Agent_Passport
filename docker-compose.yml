@@ -1,0 +1,28 @@
+# HTX Agent Passport — 本地开发环境
+# 仅启动 PostgreSQL 15。后端 / 前端在主机直接运行（uvicorn / next dev），
+# 便于热重载与调试。生产部署不在 P0 范围。
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: htx_agent_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: htx_agent_passport
+      POSTGRES_USER: htx_agent
+      POSTGRES_PASSWORD: htx_agent_dev_password
+      # 设置为 trust 仅在本地开发使用；生产环境务必改回 md5 + 随机密码。
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    ports:
+      - '5432:5432'
+    volumes:
+      - htx_agent_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U htx_agent -d htx_agent_passport']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  htx_agent_pgdata:
+    name: htx_agent_pgdata

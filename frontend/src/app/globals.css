@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Linear Design System: CSS Custom Properties ───────────────────────── */
+:root {
+  --bg: #0A0B0E;
+  --s0: #111216;
+  --s1: #1C1D21;
+  --s2: #232429;
+  --s3: #2C2D31;
+  --hov: rgba(255, 255, 255, 0.04);
+  --act: rgba(255, 255, 255, 0.06);
+  --brand: #5E6AD2;
+  --brand-light: #8B7CF6;
+  --brand-border: rgba(94, 106, 210, 0.15);
+  --brand-bg: rgba(94, 106, 210, 0.08);
+  --t1: #F4F4F5;
+  --t2: #A0A3AB;
+  --t3: #6B6F76;
+  --t4: #4A4D54;
+  --brd: rgba(255, 255, 255, 0.06);
+  --brd2: rgba(255, 255, 255, 0.08);
+  --brdh: rgba(255, 255, 255, 0.12);
+  --green: #4CB782;
+  --yellow: #E8B84C;
+  --red: #E85D5D;
+  --sidebar-w: 240px;
+  --rs: 6px;
+  --rm: 8px;
+  --rl: 12px;
+  --background: #0A0B0E;
+  --foreground: #F4F4F5;
+}
+
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(94, 106, 210, 0.3);
+  color: #fff;
+}
+
+/* ── Utility: Surface card (reusable) ────────────────────────────────────── */
+@layer components {
+  .card-surface {
+    @apply rounded-lg border border-border bg-surface-1 transition-all duration-200;
+  }
+  .card-surface-hover:hover {
+    @apply border-border-hover bg-surface-2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  }
+  .input-field {
+    @apply w-full rounded-xs border border-border bg-surface-2 px-3 py-2 text-sm text-t-1 placeholder-t-4 focus:border-brand focus:outline-none transition-colors;
+  }
+  .btn-primary {
+    @apply rounded-xs bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-light disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-outline {
+    @apply rounded-xs border border-border bg-transparent px-4 py-2 text-sm text-t-2 transition-colors hover:border-border-hover hover:text-t-1 disabled:opacity-50;
+  }
+  .badge-dot {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-medium;
+  }
+  .badge-dot::before {
+    content: '';
+    @apply h-1.5 w-1.5 rounded-full;
+    background-color: currentColor;
+  }
+  .section-title {
+    @apply text-base font-semibold tracking-tight text-t-1;
+  }
+  .section-desc {
+    @apply text-xs text-t-3 ml-3;
+  }
+  .page-heading {
+    @apply text-[28px] font-bold tracking-tight text-t-1 leading-tight;
+  }
+}

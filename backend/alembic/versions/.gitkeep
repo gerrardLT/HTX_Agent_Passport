@@ -1,0 +1,2 @@
+# 占位文件，确保空 versions 目录被 git 跟踪。
+# 后续真实迁移脚本（如 2026_01_01_0001-init_schema_initial_schema.py）会与本文件并列。

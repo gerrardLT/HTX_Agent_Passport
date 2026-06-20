@@ -1,0 +1,5 @@
+# 确保 shell 脚本始终使用 LF 换行符（Docker/Linux 需要）
+*.sh text eol=lf
+
+# 确保 Python 文件使用 LF
+*.py text eol=lf
