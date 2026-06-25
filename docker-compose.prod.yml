@@ -58,6 +58,8 @@ services:
       BAI_MAX_RETRIES: 2
       HTX_API_URL: ${HTX_API_URL:-https://api.huobi.pro}
       CORS_ORIGINS: '["http://localhost", "http://localhost:80"]'
+      VOLCENGINE_TTS_API_KEY: ${VOLCENGINE_TTS_API_KEY:-}
+      VOLCENGINE_TTS_VOICE_ID: ${VOLCENGINE_TTS_VOICE_ID:-zh_female_vv_uranus_bigtts}
     depends_on:
       postgres:
         condition: service_healthy

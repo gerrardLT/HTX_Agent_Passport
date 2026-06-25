@@ -49,7 +49,7 @@ conda activate htx-passport
 
 # 安装依赖
 cd backend
-pip install -e ".[dev]"
+pip install -r requirements.txt
 ```
 
 创建 `backend/.env`（参考仓库根目录 `.env.example`），至少配置以下变量：
@@ -62,6 +62,8 @@ pip install -e ".[dev]"
 | `GENESIS_HASH` | ✅ | 审计链首事件常量，如 `HTX_AGENT_PASSPORT_GENESIS_V1` |
 | `BAI_API_KEY` | 可选 | 留空走 mock planner；填入后调用真实 LLM（在 https://b.ai 创建，格式 `sk-xxx`） |
 | `BAI_MODEL` | 可选 | B.AI 模型 ID，默认 `deepseek-v4-flash`（也支持 `gpt-5.2` / `claude-sonnet-4-6`） |
+| `VOLCENGINE_TTS_API_KEY` | 可选 | 火山引擎 API Key，留空时演示页面降级到 Web Speech API |
+| `VOLCENGINE_TTS_VOICE_ID` | 可选 | TTS 音色 ID，默认 `zh_female_vv_uranus_bigtts` |
 
 运行数据库迁移并启动后端：
 
@@ -89,6 +91,19 @@ NEXT_PUBLIC_EXECUTION_MODE=SIMULATION
 ```
 
 前端默认运行在 http://localhost:3000。
+
+---
+
+## 产品演示页面
+
+启动后端后访问 http://localhost:8000/static/product-demo-video.html，
+即可观看带 AI 语音旁白的全流程产品演示（8幕动画 + 画中画真人头像）。
+
+演示前置：
+1. 在 `.env` 中配置 `VOLCENGINE_TTS_API_KEY`（否则降级到 Web Speech API）
+2. 以 `uvicorn main:app --host 127.0.0.1 --port 8000` 启动后端
+3. 浏览器打开 http://localhost:8000/static/product-demo-video.html
+4. 页面加载时自动预合成全部旁白（约 2 分钟），完成后自动播放
 
 ---
 
@@ -203,7 +218,7 @@ backend/
     models/       8 张表的 SQLAlchemy ORM 模型
     schemas/      Policy DSL v0 / ActionPlan v0 / 请求响应 schema
     services/     Policy Engine、Planner、审批、执行网关、HTX 适配器、恢复管理器等
-    routers/      auth / credentials / passports / approvals / scenarios
+    routers/      auth / credentials / passports / approvals / actions / audit / demo / tts / ws
   alembic/        数据库迁移
   tests/          unit (L1) / integration (L2,L4,L5) / eval (L3)
 frontend/
@@ -212,4 +227,8 @@ frontend/
     components/    NavBar / PolicyEditor / ApprovalModal / AuditTimeline 等
     hooks/         useAuth / useActionPolling
     lib/           API 客户端 / 类型
+design-demos/
+  product-demo-video.html  全流程产品演示页面（8幕 + TTS 旁白 + PIP 头像）
+  avatar.png               画中画真人头像
+  index.html               三版 UI 设计变体预览
 ```
