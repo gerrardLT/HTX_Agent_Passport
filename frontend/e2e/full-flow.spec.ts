@@ -10,7 +10,7 @@ test("Full demo flow: login → credentials → passport → task → audit", as
   const page = await context.newPage();
 
   // ==================== Step 1: Landing Page ====================
-  await page.goto("http://localhost:3000");
+  await page.goto("http://localhost:3001");
   await expect(page).toHaveTitle(/HTX|Agent|Passport/i);
   console.log("[1] Landing page loaded ✓");
 
@@ -31,7 +31,7 @@ test("Full demo flow: login → credentials → passport → task → audit", as
   }
 
   // ==================== Step 3: Navigate to Credentials ====================
-  await page.goto("http://localhost:3000/credentials");
+  await page.goto("http://localhost:3001/credentials");
   await page.waitForLoadState("networkidle");
   const credPageContent = await page.textContent("body");
   expect(credPageContent).toBeTruthy();
@@ -40,7 +40,7 @@ test("Full demo flow: login → credentials → passport → task → audit", as
   );
 
   // ==================== Step 4: Navigate to Passports ====================
-  await page.goto("http://localhost:3000/passports");
+  await page.goto("http://localhost:3001/passports");
   await page.waitForLoadState("networkidle");
   const passportContent = await page.textContent("body");
   expect(passportContent).toBeTruthy();
@@ -49,28 +49,28 @@ test("Full demo flow: login → credentials → passport → task → audit", as
   );
 
   // ==================== Step 5: Navigate to Dashboard ====================
-  await page.goto("http://localhost:3000/dashboard");
+  await page.goto("http://localhost:3001/dashboard");
   await page.waitForLoadState("networkidle");
   const dashContent = await page.textContent("body");
   expect(dashContent).toBeTruthy();
   console.log(`[5] Dashboard page loaded ✓`);
 
   // ==================== Step 6: Navigate to Demo scenario page ====================
-  await page.goto("http://localhost:3000/demo");
+  await page.goto("http://localhost:3001/demo");
   await page.waitForLoadState("networkidle");
   const demoContent = await page.textContent("body");
   expect(demoContent).toBeTruthy();
   console.log(`[6] Demo page loaded ✓`);
 
   // ==================== Step 7: Navigate to Audit ====================
-  await page.goto("http://localhost:3000/audit");
+  await page.goto("http://localhost:3001/audit");
   await page.waitForLoadState("networkidle");
   const auditContent = await page.textContent("body");
   expect(auditContent).toBeTruthy();
   console.log(`[7] Audit page loaded ✓`);
 
   // ==================== Step 8: Create Passport Page ====================
-  await page.goto("http://localhost:3000/passports/new");
+  await page.goto("http://localhost:3001/passports/new");
   await page.waitForLoadState("networkidle");
   const newPassportContent = await page.textContent("body");
   expect(newPassportContent).toBeTruthy();
@@ -82,9 +82,9 @@ test("Full demo flow: login → credentials → passport → task → audit", as
     if (msg.type() === "error") consoleErrors.push(msg.text());
   });
   // Revisit a few pages to collect any JS errors
-  await page.goto("http://localhost:3000/dashboard");
+  await page.goto("http://localhost:3001/dashboard");
   await page.waitForLoadState("networkidle");
-  await page.goto("http://localhost:3000/credentials");
+  await page.goto("http://localhost:3001/credentials");
   await page.waitForLoadState("networkidle");
 
   if (consoleErrors.length > 0) {
@@ -105,7 +105,7 @@ test("Full demo flow: login → credentials → passport → task → audit", as
     "/audit",
   ];
   for (const path of pages) {
-    const resp = await page.goto(`http://localhost:3000${path}`);
+    const resp = await page.goto(`http://localhost:3001${path}`);
     expect(resp?.status()).toBeLessThan(500);
   }
   console.log("[10] All pages return < 500 status ✓");

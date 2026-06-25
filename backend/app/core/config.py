@@ -217,11 +217,21 @@ class Settings(BaseSettings):
 
     # ---- CORS 配置（Task 4.2）----
     CORS_ORIGINS: list[str] = Field(
-        default=["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+        default=["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:8888", "http://127.0.0.1:8888"],
         description=(
             "CORS 允许的源列表。开发默认 localhost:3000；"
             "生产环境必须配置为具体域名。"
         ),
+    )
+
+    # ---- 火山引擎 TTS 语音合成（产品演示视频配音）----
+    VOLCENGINE_TTS_API_KEY: str = Field(
+        default="",
+        description="火山引擎 API Key（从控制台 > API Key管理获取）。",
+    )
+    VOLCENGINE_TTS_VOICE_ID: str = Field(
+        default="zh_female_vv_uranus_bigtts",
+        description="默认声音 ID（speaker）。可在火山引擎控制台音色库查看。",
     )
 
     # ---- 启动时安全校验（Task 4.3）----

@@ -13,8 +13,11 @@ import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
@@ -28,6 +31,7 @@ from app.routers import auth as auth_router
 from app.routers import credentials as credentials_router
 from app.routers import demo as demo_router
 from app.routers import passports as passports_router
+from app.routers import tts as tts_router
 from app.routers import ws as ws_router
 from app.services.audit_sth_scheduler import build_default_scheduler
 
@@ -145,6 +149,14 @@ def create_app() -> FastAPI:
 
     # WebSocket 路由（Task 3 / P2 — 实时推送）
     app.include_router(ws_router.router, tags=["websocket"])
+
+    # TTS 语音合成代理（火山引擎豆包语音，产品演示视频配音）
+    app.include_router(tts_router.router, prefix="/api/tts", tags=["tts"])
+
+    # 静态文件：产品演示 HTML 页面
+    demos_dir = Path(__file__).resolve().parent.parent / "design-demos"
+    if demos_dir.is_dir():
+        app.mount("/static", StaticFiles(directory=str(demos_dir), html=True), name="static")
 
     return app
 

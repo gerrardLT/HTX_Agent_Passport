@@ -109,3 +109,7 @@ backend/passport_id.txt
 backend/local_dev.db
 frontend/test-results/
 frontend/screenshot.mjs
+
+# 浏览器 Agent 临时截图
+.tmp-*.png
+*.tmp.png

@@ -32,94 +32,120 @@ export default function LandingPage() {
 
   // 滚动渐入
   useEffect(() => {
-    const els = document.querySelectorAll(`.${s.reveal}`);
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add(s.visible);
-        });
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' },
-    );
-    els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
+    const init = () => {
+      const els = document.querySelectorAll(`.${s.reveal}`);
+      if (els.length === 0) return;
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add(s.visible);
+          });
+        },
+        { threshold: 0.1 },
+      );
+      els.forEach((el) => {
+        obs.observe(el);
+        // 视口内元素立即显示
+        const r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) {
+          el.classList.add(s.visible);
+        }
+      });
+      return () => obs.disconnect();
+    };
+    // 双 rAF 确保 DOM 完成渲染
+    const id = requestAnimationFrame(() => requestAnimationFrame(init));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   // 终端打字动画
   const terminalRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!terminalRef.current) return;
-    const el = terminalRef.current;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          el.querySelectorAll(`.${s.terminalLine}`).forEach((line) => {
-            const delay = Number((line as HTMLElement).dataset.delay) || 0;
-            setTimeout(() => line.classList.add(s.typed), delay);
-          });
-          obs.unobserve(el);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+    const init = () => {
+      if (!terminalRef.current) return;
+      const el = terminalRef.current;
+      const obs = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            el.querySelectorAll(`.${s.terminalLine}`).forEach((line) => {
+              const delay = Number((line as HTMLElement).dataset.delay) || 0;
+              setTimeout(() => line.classList.add(s.typed), delay);
+            });
+            obs.unobserve(el);
+          }
+        },
+        { threshold: 0.3 },
+      );
+      obs.observe(el);
+      return () => obs.disconnect();
+    };
+    const id = requestAnimationFrame(() => requestAnimationFrame(init));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   // 数字计数器
   useEffect(() => {
-    const nums = document.querySelectorAll('[data-count]');
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const el = entry.target as HTMLElement;
-          const display = el.dataset.display;
-          if (display) { el.textContent = display; obs.unobserve(el); return; }
-          const target = parseInt(el.dataset.count!);
-          const suffix = el.dataset.suffix || '';
-          if (target === 0) { el.textContent = '0'; return; }
-          const duration = 1200;
-          const start = performance.now();
-          const animate = (now: number) => {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            el.textContent = Math.round(target * eased) + suffix;
-            if (progress < 1) requestAnimationFrame(animate);
-          };
-          requestAnimationFrame(animate);
-          obs.unobserve(el);
-        });
-      },
-      { threshold: 0.5 },
-    );
-    nums.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
+    const init = () => {
+      const nums = document.querySelectorAll('[data-count]');
+      if (nums.length === 0) return;
+      const obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target as HTMLElement;
+            const display = el.dataset.display;
+            if (display) { el.textContent = display; obs.unobserve(el); return; }
+            const target = parseInt(el.dataset.count!);
+            const suffix = el.dataset.suffix || '';
+            if (target === 0) { el.textContent = '0'; return; }
+            const duration = 1200;
+            const start = performance.now();
+            const animate = (now: number) => {
+              const progress = Math.min((now - start) / duration, 1);
+              const eased = 1 - Math.pow(1 - progress, 3);
+              el.textContent = Math.round(target * eased) + suffix;
+              if (progress < 1) requestAnimationFrame(animate);
+            };
+            requestAnimationFrame(animate);
+            obs.unobserve(el);
+          });
+        },
+        { threshold: 0.5 },
+      );
+      nums.forEach((el) => obs.observe(el));
+      return () => obs.disconnect();
+    };
+    const id = requestAnimationFrame(() => requestAnimationFrame(init));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   // 状态机流光
   const flowRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!flowRef.current) return;
-    const el = flowRef.current;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0].isIntersecting) return;
-        const nodes = el.querySelectorAll(`.${s.stateNode}`);
-        nodes.forEach((node, i) => {
-          setTimeout(() => {
-            node.classList.add(s.lit);
-            if (i < nodes.length - 1) {
-              setTimeout(() => node.classList.remove(s.lit), 600);
-            }
-          }, i * 400);
-        });
-        obs.unobserve(el);
-      },
-      { threshold: 0.4 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+    const init = () => {
+      if (!flowRef.current) return;
+      const el = flowRef.current;
+      const obs = new IntersectionObserver(
+        (entries) => {
+          if (!entries[0].isIntersecting) return;
+          const nodes = el.querySelectorAll(`.${s.stateNode}`);
+          nodes.forEach((node, i) => {
+            setTimeout(() => {
+              node.classList.add(s.lit);
+              if (i < nodes.length - 1) {
+                setTimeout(() => node.classList.remove(s.lit), 600);
+              }
+            }, i * 400);
+          });
+          obs.unobserve(el);
+        },
+        { threshold: 0.4 },
+      );
+      obs.observe(el);
+      return () => obs.disconnect();
+    };
+    const id = requestAnimationFrame(() => requestAnimationFrame(init));
+    return () => cancelAnimationFrame(id);
   }, []);
 
   if (!isInitialized) return null;
