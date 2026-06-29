@@ -1,0 +1,130 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# 生产部署使用 cancel-in-progress: false，避免取消正在进行的部署导致中间态
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # --- Backend ---
+      - name: Extract metadata (backend)
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}-backend
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,scope=backend,mode=max
+
+      # --- Frontend ---
+      - name: Extract metadata (frontend)
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}-frontend
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=/api
+            NEXT_PUBLIC_EXECUTION_MODE=${{ vars.NEXT_PUBLIC_EXECUTION_MODE }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,scope=frontend,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-push
+    # production 受保护环境：必需审批者规则在作业执行前拦截（Req 5.3）
+    environment: production
+    steps:
+      # 检出仓库，以便将 compose 与 nginx 配置同步到生产服务器
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 自动同步部署所需的配置文件到服务器家目录（compose 与 nginx）。
+      # 注意：.env.prod 含密钥、不入仓库，需由运维手动预置在服务器家目录，本步骤不覆盖它。
+      - name: Sync deploy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "docker-compose.prod.yml,nginx"
+          target: "~/"
+
+      - name: Deploy to production server over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          # 敏感值经 envs 注入远端环境，避免在 script 中明文展开；GHCR 登录使用 --password-stdin
+          envs: GHCR_USER,GHCR_TOKEN,DEPLOY_SHA
+          script: |
+            set -euo pipefail
+
+            # 0) 确认 .env.prod 已由运维预置（缺失则立即失败，避免使用错误配置启动）
+            test -f .env.prod || { echo "ERROR: ~/.env.prod 不存在，请先在服务器预置该文件"; exit 1; }
+
+            # 1) GHCR 登录（服务器侧拉取私有镜像）
+            echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_USER}" --password-stdin
+
+            # 2) 锁定本次镜像标签
+            export IMAGE_TAG="${DEPLOY_SHA}"
+
+            # 3) 拉取预构建镜像（Req 4.2）
+            docker compose --env-file .env.prod -f docker-compose.prod.yml pull backend frontend
+
+            # 4) 启动/更新服务（Req 4.3）
+            docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
+
+            # 5) 显式执行数据库迁移并让失败可见（Req 4.4、4.5）
+            # 失败时 set -e 终止脚本使作业失败，不清理容器，保留日志供排查
+            docker compose --env-file .env.prod -f docker-compose.prod.yml exec -T backend alembic upgrade head
+        env:
+          GHCR_USER: ${{ secrets.GHCR_USER }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          DEPLOY_SHA: ${{ github.sha }}

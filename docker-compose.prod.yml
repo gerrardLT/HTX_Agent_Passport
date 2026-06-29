@@ -1,11 +1,14 @@
 # =============================================================================
 # HTX Agent Passport — 生产部署（docker-compose.prod.yml）
 #
-# 架构：Nginx(80) → Frontend(3000) + Backend(8000) → PostgreSQL(5432)
+# 架构：Nginx(80) → Frontend(3000) + Backend(8000) → Neon PostgreSQL（外部托管）
+#
+# 数据库说明：使用 Neon 托管 PostgreSQL（外部服务），不在本 compose 内运行数据库容器。
+#   连接信息通过 .env.prod 中的 DATABASE_URL 注入后端。
 #
 # 使用方式：
-#   1. 复制 .env.prod 并填写真实密钥
-#   2. docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --build
+#   1. 在 .env.prod 中填写真实密钥与 DATABASE_URL（Neon 连接串）
+#   2. docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
 #   3. 访问 http://your-server-ip
 #
 # 停止：docker compose -f docker-compose.prod.yml down
@@ -13,34 +16,14 @@
 # =============================================================================
 
 services:
-  # ─── PostgreSQL 数据库 ────────────────────────────────────────────────────
-  postgres:
-    image: postgres:15-alpine
-    container_name: htx_passport_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-htx_agent_passport}
-      POSTGRES_USER: ${POSTGRES_USER:-htx_agent}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-htx_agent} -d ${POSTGRES_DB:-htx_agent_passport}']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - internal
-
   # ─── 后端 API（FastAPI + Uvicorn）────────────────────────────────────────
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ghcr.io/gerrardlt/htx_agent_passport-backend:${IMAGE_TAG:-latest}
     container_name: htx_passport_backend
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-htx_agent}:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/${POSTGRES_DB:-htx_agent_passport}
+      # Neon 托管 PostgreSQL 连接串（含 ?sslmode=require），由 .env.prod 注入
+      DATABASE_URL: ${DATABASE_URL}
       VAULT_MASTER_KEY: ${VAULT_MASTER_KEY}
       VAULT_KEY_PROVIDER: ${VAULT_KEY_PROVIDER:-local}
       JWT_SECRET: ${JWT_SECRET}
@@ -60,20 +43,12 @@ services:
       CORS_ORIGINS: '["http://localhost", "http://localhost:80"]'
       VOLCENGINE_TTS_API_KEY: ${VOLCENGINE_TTS_API_KEY:-}
       VOLCENGINE_TTS_VOICE_ID: ${VOLCENGINE_TTS_VOICE_ID:-zh_female_vv_uranus_bigtts}
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - internal
 
   # ─── 前端（Next.js 14 standalone）────────────────────────────────────────
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_BASE_URL: /api
-        NEXT_PUBLIC_EXECUTION_MODE: ${NEXT_PUBLIC_EXECUTION_MODE:-SIMULATION}
+    image: ghcr.io/gerrardlt/htx_agent_passport-frontend:${IMAGE_TAG:-latest}
     container_name: htx_passport_frontend
     restart: unless-stopped
     depends_on:
@@ -95,10 +70,6 @@ services:
       - backend
     networks:
       - internal
-
-volumes:
-  pgdata:
-    name: htx_passport_pgdata
 
 networks:
   internal:
