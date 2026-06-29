@@ -1,0 +1,4 @@
+# 占位文件：保持 public/ 目录被 git 跟踪。
+# Next.js 的 public/ 为静态资源目录，Dockerfile 运行阶段会 COPY 此目录；
+# git 不跟踪空目录，缺少占位文件会导致 CI/CD 在 runner 上 checkout 后丢失该目录，
+# 进而使 `COPY --from=builder /app/public ./public` 失败。
