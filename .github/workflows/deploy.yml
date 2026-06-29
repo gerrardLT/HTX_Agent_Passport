@@ -71,8 +71,9 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_BASE_URL=
             NEXT_PUBLIC_EXECUTION_MODE=${{ vars.NEXT_PUBLIC_EXECUTION_MODE }}
-          cache-from: type=gha,scope=frontend
-          cache-to: type=gha,scope=frontend,mode=max
+          # 临时禁用缓存：确保 NEXT_PUBLIC_API_BASE_URL 变更后前端被真正重新编译，
+          # 避免命中旧的 npm run build 缓存层。验证修复后可恢复 gha 缓存以加速。
+          no-cache: true
 
   deploy:
     runs-on: ubuntu-latest
