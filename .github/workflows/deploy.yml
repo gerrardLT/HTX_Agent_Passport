@@ -84,8 +84,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 自动同步部署所需的配置文件到服务器家目录（compose 与 nginx）。
-      # 注意：.env.prod 含密钥、不入仓库，需由运维手动预置在服务器家目录，本步骤不覆盖它。
+      # 同步部署所需的配置文件到服务器项目目录（compose 与 nginx）。
+      # 注意：.env.prod 含密钥、不入仓库，由运维手动预置在项目目录，本步骤不覆盖它。
       - name: Sync deploy files to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -93,7 +93,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "docker-compose.prod.yml,nginx"
-          target: "~/"
+          target: "/www/wwwroot/HTX_Agent_Passport"
 
       - name: Deploy to production server over SSH
         uses: appleboy/ssh-action@v1
@@ -106,8 +106,11 @@ jobs:
           script: |
             set -euo pipefail
 
-            # 0) 确认 .env.prod 已由运维预置（缺失则立即失败，避免使用错误配置启动）
-            test -f .env.prod || { echo "ERROR: ~/.env.prod 不存在，请先在服务器预置该文件"; exit 1; }
+            # 进入服务器上的项目目录（宝塔站点目录），使用该目录下的 .env.prod 与 compose
+            cd /www/wwwroot/HTX_Agent_Passport
+
+            # 0) 确认 .env.prod 已预置（缺失则立即失败，避免使用错误配置启动）
+            test -f .env.prod || { echo "ERROR: /www/wwwroot/HTX_Agent_Passport/.env.prod 不存在，请先在该目录预置"; exit 1; }
 
             # 1) GHCR 登录（服务器侧拉取私有镜像）
             echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_USER}" --password-stdin
