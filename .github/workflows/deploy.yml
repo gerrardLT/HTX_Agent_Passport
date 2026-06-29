@@ -115,8 +115,8 @@ jobs:
             # 1) GHCR 登录（服务器侧拉取私有镜像）
             echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_USER}" --password-stdin
 
-            # 2) 锁定本次镜像标签
-            export IMAGE_TAG="${DEPLOY_SHA}"
+            # 2) 锁定本次镜像标签（与 build-push 的 metadata-action type=sha 标签一致：sha-<full-sha>）
+            export IMAGE_TAG="sha-${DEPLOY_SHA}"
 
             # 3) 拉取预构建镜像（Req 4.2）
             docker compose --env-file .env.prod -f docker-compose.prod.yml pull backend frontend
