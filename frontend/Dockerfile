@@ -18,7 +18,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # 构建时注入环境变量（NEXT_PUBLIC_ 前缀会编译进客户端代码）
-ARG NEXT_PUBLIC_API_BASE_URL=/api
+# NEXT_PUBLIC_API_BASE_URL 默认空 = 同域相对路径（请求 /api/...，由 nginx 转发到后端）。
+# 前端各接口 path 已自带 /api 前缀，故此处必须为空，否则会出现 /api/api 重复。
+ARG NEXT_PUBLIC_API_BASE_URL=
 ARG NEXT_PUBLIC_EXECUTION_MODE=SIMULATION
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_EXECUTION_MODE=$NEXT_PUBLIC_EXECUTION_MODE

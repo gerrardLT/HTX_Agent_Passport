@@ -74,7 +74,7 @@ jobs:
       - name: Build (next build)
         run: npm run build
         env:
-          NEXT_PUBLIC_API_BASE_URL: /api
+          NEXT_PUBLIC_API_BASE_URL: ""
 
       # 可选 Playwright E2E 步骤（任务 1.4）
       # 启用条件：PR 携带 'e2e' 标签，或手动触发并将 run_e2e 设为 true
