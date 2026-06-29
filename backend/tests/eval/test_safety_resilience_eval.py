@@ -300,9 +300,7 @@ def _rubric_score_action_plan(plan: dict) -> float:
         score += 1.0
     if actions:
         a0 = actions[0]
-        if a0.get("type") in ("read_market", "read_account", "no_op"):
-            score += 1.0
-        elif a0.get("type") == "place_order" and a0.get("limit_price"):
+        if a0.get("type") in ("read_market", "read_account", "no_op") or a0.get("type") == "place_order" and a0.get("limit_price"):
             score += 1.0
     return min(5.0, score)
 

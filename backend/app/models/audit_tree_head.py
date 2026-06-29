@@ -61,5 +61,5 @@ class AuditTreeHead(Base, UUIDPrimaryKeyMixin, CreatedAtMixin):
     signature: Mapped[str] = mapped_column(Text, nullable=False)
     signed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
-    user: Mapped["User"] = relationship(lazy="select")
-    passport: Mapped["AgentPassport | None"] = relationship(lazy="select")
+    user: Mapped[User] = relationship(lazy="select")
+    passport: Mapped[AgentPassport | None] = relationship(lazy="select")

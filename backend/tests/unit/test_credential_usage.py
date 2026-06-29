@@ -18,7 +18,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 import pytest
 from sqlalchemy.orm import Session
@@ -116,8 +116,9 @@ class TestExpiration:
     def test_expired_writes_audit_event(
         self, db_session: Session, credential: ApiCredential
     ) -> None:
-        from app.models import AuditEvent
         from sqlalchemy import select
+
+        from app.models import AuditEvent
 
         credential.expires_at = datetime(2026, 1, 1, tzinfo=UTC)
         db_session.flush()

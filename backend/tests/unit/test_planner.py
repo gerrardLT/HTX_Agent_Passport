@@ -34,7 +34,6 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
-import pytest
 from sqlalchemy import select
 
 from app.models import AuditEvent, ModelCall, User
@@ -52,7 +51,6 @@ from app.services.context_builder import PlannerContext
 from app.services.planner import (
     PLANNER_SYSTEM_PROMPT,
     PlannerConfig,
-    PlannerResult,
     call_planner,
     mock_planner_fallback,
 )

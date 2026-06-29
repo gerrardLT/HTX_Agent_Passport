@@ -24,17 +24,13 @@
 
 from __future__ import annotations
 
-import asyncio
 import hashlib
 import uuid
-from datetime import UTC, datetime
-from typing import Any
 
 import pytest
 from sqlalchemy.orm import Session
 
 from app.models import AuditEvent, AuditTreeHead, User
-from app.services.audit_sth_anchor import anchor_sth_to_file
 from app.services.audit_sth_scheduler import (
     STHScheduler,
     build_default_scheduler,
@@ -188,7 +184,6 @@ class TestSTHSchedulerLifecycle:
     @pytest.mark.asyncio
     async def test_start_then_stop(self) -> None:
         """start → is_running=True；stop → is_running=False。"""
-        ticks = 0
 
         def _factory():
             class _NoopSession:
@@ -393,7 +388,6 @@ class TestBuildDefaultScheduler:
         from app.core.config import get_settings
         from app.services.audit_sth_anchor import (
             JsonLineFileAnchorBackend,
-            NullAnchorBackend,
         )
 
         monkeypatch.setenv("AUDIT_STH_INTERVAL_SECONDS", "120")

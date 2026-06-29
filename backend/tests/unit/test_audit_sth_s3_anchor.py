@@ -34,7 +34,6 @@ from moto import mock_aws
 from app.core.config import get_settings
 from app.models import AuditTreeHead
 from app.services.audit_sth_anchor import (
-    AnchorBackend,
     JsonLineFileAnchorBackend,
     NullAnchorBackend,
     S3ObjectLockAnchorBackend,

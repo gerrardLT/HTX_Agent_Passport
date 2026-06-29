@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any
-from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -45,7 +44,7 @@ class AuditEventResponse(BaseModel):
     created_at: datetime
 
     @classmethod
-    def from_orm_event(cls, event: AuditEvent) -> "AuditEventResponse":
+    def from_orm_event(cls, event: AuditEvent) -> AuditEventResponse:
         """把 ORM 行转成响应模型。
 
         UUID 字段用 ``str()`` 转 hex；trace_id 是 nullable，None 直接透传。
@@ -87,7 +86,7 @@ class SthResponse(BaseModel):
     signed_at: datetime
 
     @classmethod
-    def from_orm_sth(cls, sth: AuditTreeHead) -> "SthResponse":
+    def from_orm_sth(cls, sth: AuditTreeHead) -> SthResponse:
         return cls(
             id=str(sth.id),
             user_id=str(sth.user_id),

@@ -39,8 +39,8 @@ from app.models.enums import (
     PassportState,
 )
 from app.services.capability_envelope import (
-    PolicyTemplate,
     TEMPLATE_SMALL_SPOT_EXECUTOR,
+    PolicyTemplate,
 )
 from app.services.credentials import CredentialNotFoundError
 from app.services.passports import (

@@ -13,13 +13,14 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 from uuid import UUID
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from sqlalchemy import select
 
-from app.core.auth import decode_access_token, InvalidTokenError
+from app.core.auth import InvalidTokenError, decode_access_token
 from app.core.database import get_db_session
 from app.models import AgentAction
 from app.services.ws_broker import broker
@@ -73,10 +74,8 @@ async def action_ws(websocket: WebSocket, action_id: str, token: str = "") -> No
                 await websocket.close(code=4002, reason="action not found")
                 return
         finally:
-            try:
+            with contextlib.suppress(StopIteration):
                 next(session_gen)
-            except StopIteration:
-                pass
     except Exception:
         logger.exception("WS action lookup failed")
         await websocket.close(code=4500, reason="internal error")
@@ -99,7 +98,7 @@ async def action_ws(websocket: WebSocket, action_id: str, token: str = "") -> No
             try:
                 message = await asyncio.wait_for(queue.get(), timeout=30.0)
                 await websocket.send_text(message)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # 心跳：每 30s 发送 ping 保持连接
                 await websocket.send_json({"type": "ping"})
     except WebSocketDisconnect:

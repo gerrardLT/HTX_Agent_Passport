@@ -25,7 +25,7 @@
 from __future__ import annotations
 
 import argparse
-import os
+import contextlib
 import stat
 import sys
 from pathlib import Path
@@ -57,10 +57,8 @@ def generate_keypair(out_dir: Path, prefix: str = "sth") -> tuple[Path, Path, Pa
         )
     )
     # 私钥仅文件所有者可读（POSIX；Windows 上 chmod 是 best-effort）
-    try:
+    with contextlib.suppress(OSError, NotImplementedError):
         priv_path.chmod(stat.S_IRUSR | stat.S_IWUSR)
-    except (OSError, NotImplementedError):
-        pass
 
     public_key = private_key.public_key()
     pub_path.write_bytes(
@@ -107,13 +105,13 @@ def main() -> int:
     print(f"  public hex:  {hex_path.resolve()}")
     print()
     print("Next steps:")
-    print(f"  1. Set in backend/.env:")
-    print(f"     AUDIT_STH_SIGNING_ALGO=ed25519")
+    print("  1. Set in backend/.env:")
+    print("     AUDIT_STH_SIGNING_ALGO=ed25519")
     print(f"     AUDIT_STH_ED25519_PRIVATE_KEY_PATH={priv_path.resolve()}")
     print(f"     AUDIT_STH_ED25519_PUBLIC_KEY_PATH={pub_path.resolve()}")
-    print(f"  2. Restart backend.")
+    print("  2. Restart backend.")
     print(f"  3. Publish {hex_path.name} to your README / public git for")
-    print(f"     external auditors to verify STH signatures independently.")
+    print("     external auditors to verify STH signatures independently.")
     return 0
 
 

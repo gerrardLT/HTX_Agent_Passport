@@ -133,9 +133,8 @@ class TestBAIClientTimeout:
         def handler(request: httpx.Request) -> httpx.Response:
             raise httpx.ReadTimeout("simulated read timeout")
 
-        with _make_client(handler) as client:
-            with pytest.raises(BAITimeoutError) as exc_info:
-                client.chat("s", "u", timeout=1.0)
+        with _make_client(handler) as client, pytest.raises(BAITimeoutError) as exc_info:
+            client.chat("s", "u", timeout=1.0)
 
         # 异常消息含 timeout 字样但不含 api_key
         msg = str(exc_info.value)
@@ -154,9 +153,8 @@ class TestBAIClientServiceUnavailable:
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(status, text="upstream error")
 
-        with _make_client(handler) as client:
-            with pytest.raises(BAIServiceUnavailableError):
-                client.chat("s", "u", timeout=5.0)
+        with _make_client(handler) as client, pytest.raises(BAIServiceUnavailableError):
+            client.chat("s", "u", timeout=5.0)
 
     def test_500_treated_as_service_unavailable(self) -> None:
         """其它 5xx（500/501）也归入 service_unavailable，与 Req 14 AC5 协同。"""
@@ -164,17 +162,15 @@ class TestBAIClientServiceUnavailable:
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(500, text="internal error")
 
-        with _make_client(handler) as client:
-            with pytest.raises(BAIServiceUnavailableError):
-                client.chat("s", "u", timeout=5.0)
+        with _make_client(handler) as client, pytest.raises(BAIServiceUnavailableError):
+            client.chat("s", "u", timeout=5.0)
 
     def test_connect_error_raises_service_unavailable(self) -> None:
         def handler(request: httpx.Request) -> httpx.Response:
             raise httpx.ConnectError("connection refused")
 
-        with _make_client(handler) as client:
-            with pytest.raises(BAIServiceUnavailableError):
-                client.chat("s", "u", timeout=5.0)
+        with _make_client(handler) as client, pytest.raises(BAIServiceUnavailableError):
+            client.chat("s", "u", timeout=5.0)
 
 
 # ---------------------------------------------------------------------------
@@ -187,17 +183,15 @@ class TestBAIClientMalformedResponse:
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, text="not a json {{{")
 
-        with _make_client(handler) as client:
-            with pytest.raises(BAIError):
-                client.chat("s", "u", timeout=5.0)
+        with _make_client(handler) as client, pytest.raises(BAIError):
+            client.chat("s", "u", timeout=5.0)
 
     def test_missing_choices_raises_bai_error(self) -> None:
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json={"id": "test"})
 
-        with _make_client(handler) as client:
-            with pytest.raises(BAIError):
-                client.chat("s", "u", timeout=5.0)
+        with _make_client(handler) as client, pytest.raises(BAIError):
+            client.chat("s", "u", timeout=5.0)
 
     def test_non_string_content_raises_bai_error(self) -> None:
         body = _ok_body()
@@ -206,9 +200,8 @@ class TestBAIClientMalformedResponse:
         def handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(200, json=body)
 
-        with _make_client(handler) as client:
-            with pytest.raises(BAIError):
-                client.chat("s", "u", timeout=5.0)
+        with _make_client(handler) as client, pytest.raises(BAIError):
+            client.chat("s", "u", timeout=5.0)
 
     def test_400_raises_bai_error_not_unavailable(self) -> None:
         """4xx 非 429 → :class:`BAIError`（不重试也不视作不可用）。"""

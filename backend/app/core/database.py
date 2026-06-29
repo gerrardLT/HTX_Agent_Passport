@@ -22,13 +22,12 @@ import uuid as _uuid
 from collections.abc import Iterator
 from datetime import UTC, datetime
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.schema import ColumnDefault as _ColumnDefault
-from sqlalchemy.sql import func as _sa_func
 
 from app.core.config import get_settings
 
@@ -80,7 +79,7 @@ def _install_sqlite_compat() -> None:
                 def process(value):  # type: ignore[no-untyped-def]
                     if value is None:
                         return None
-                    if isinstance(value, (bytes, bytearray)):
+                    if isinstance(value, bytes | bytearray):
                         value = value.decode("utf-8")
                     if isinstance(value, str):
                         return _json.loads(value)

@@ -53,7 +53,7 @@ class Approval(Base, UUIDPrimaryKeyMixin, CreatedAtMixin):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     # ---- 关系 ----
-    action: Mapped["AgentAction"] = relationship(
+    action: Mapped[AgentAction] = relationship(
         back_populates="approvals", lazy="select"
     )
-    user: Mapped["User"] = relationship(back_populates="approvals", lazy="select")
+    user: Mapped[User] = relationship(back_populates="approvals", lazy="select")

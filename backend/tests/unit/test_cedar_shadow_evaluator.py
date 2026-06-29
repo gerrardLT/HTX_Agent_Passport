@@ -27,8 +27,6 @@ import pytest
 cedarpy = pytest.importorskip("cedarpy")
 
 from app.services.policy_engine_cedar import (
-    CEDAR_POLICIES,
-    CEDAR_SCHEMA_JSON,
     CedarShadowResult,
     cedar_decision_matches_main,
     shadow_evaluate,
@@ -313,6 +311,7 @@ class TestParityWithMainEngine:
         self, baseline_inputs: dict[str, Any]
     ) -> None:
         from datetime import UTC, datetime
+
         from app.services.policy_engine import (
             DailyActionHistory,
             GlobalConfig,
@@ -347,6 +346,7 @@ class TestParityWithMainEngine:
         self, baseline_inputs: dict[str, Any]
     ) -> None:
         from datetime import UTC, datetime
+
         from app.services.policy_engine import (
             DailyActionHistory,
             GlobalConfig,
@@ -375,6 +375,7 @@ class TestParityWithMainEngine:
     ) -> None:
         """正常情况：主路径 REQUIRE_APPROVAL,Cedar Allow → 一致。"""
         from datetime import UTC, datetime
+
         from app.services.policy_engine import (
             DailyActionHistory,
             GlobalConfig,
@@ -440,7 +441,6 @@ class TestExecutionGatewayIntegration:
         import logging
 
         from app.services.policy_engine_cedar import (
-            CedarShadowResult,
             log_cedar_shadow_difference,
         )
 
@@ -465,7 +465,6 @@ class TestExecutionGatewayIntegration:
         import logging
 
         from app.services.policy_engine_cedar import (
-            CedarShadowResult,
             log_cedar_shadow_difference,
         )
 

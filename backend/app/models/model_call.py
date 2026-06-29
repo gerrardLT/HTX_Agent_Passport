@@ -54,9 +54,9 @@ class ModelCall(Base, UUIDPrimaryKeyMixin, CreatedAtMixin):
     raw_response: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
 
     # ---- 关系 ----
-    action: Mapped["AgentAction | None"] = relationship(
+    action: Mapped[AgentAction | None] = relationship(
         back_populates="model_calls", lazy="select"
     )
-    execution_results: Mapped[list["ExecutionResult"]] = relationship(
+    execution_results: Mapped[list[ExecutionResult]] = relationship(
         back_populates="model_call", lazy="select"
     )

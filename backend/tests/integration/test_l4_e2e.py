@@ -36,8 +36,8 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import AgentAction, AgentPassport, Approval, AuditEvent, User
-from app.models.enums import ActionState, AuditEventType, PassportState
+from app.models import AgentAction, Approval, AuditEvent
+from app.models.enums import ActionState, AuditEventType
 from app.services.approval_service import (
     ActionNotInApprovalStateError,
     ApprovalPassportRevokedError,

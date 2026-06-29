@@ -251,7 +251,7 @@ class BAIClient:
         if self._owned_client:
             self._http.close()
 
-    def __enter__(self) -> "BAIClient":
+    def __enter__(self) -> BAIClient:
         return self
 
     def __exit__(self, *exc: Any) -> None:

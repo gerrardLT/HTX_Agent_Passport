@@ -12,15 +12,11 @@
 
 from __future__ import annotations
 
-import uuid
-
-import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import AgentPassport, AuditEvent, User
 from app.models.enums import AuditEventType
-from app.services.audit_writer import AuditWriter
 from app.services.reputation_service import ReputationService
 
 

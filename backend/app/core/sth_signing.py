@@ -82,7 +82,7 @@ def _canonical_payload(tree_size: int, root_hash: str, signed_at_iso: str) -> by
     把版本号 ``v1`` 放进去给未来格式升级留空间——若改为 v2 必须更新此函数
     + 加新版本前缀。
     """
-    return f"v1|{tree_size}|{root_hash}|{signed_at_iso}".encode("utf-8")
+    return f"v1|{tree_size}|{root_hash}|{signed_at_iso}".encode()
 
 
 # ---------------------------------------------------------------------------

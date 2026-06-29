@@ -73,7 +73,6 @@ from app.services.audit_writer import (
     write_audit_event,
 )
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -481,10 +480,7 @@ def _passes_auto_approval_thresholds(
     max_per_day = thresholds.get("max_per_day")
     if max_per_day is None:
         return False  # 未配置 → 不放行（保守）
-    if daily_history.auto_approved_count_today_utc >= int(max_per_day):
-        return False
-
-    return True
+    return not daily_history.auto_approved_count_today_utc >= int(max_per_day)
 
 
 # ---------------------------------------------------------------------------

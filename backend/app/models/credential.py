@@ -104,7 +104,7 @@ class ApiCredential(Base, UUIDPrimaryKeyMixin, CreatedAtMixin):
     )
 
     # ---- 关系 ----
-    user: Mapped["User"] = relationship(back_populates="credentials", lazy="select")
-    passports: Mapped[list["AgentPassport"]] = relationship(
+    user: Mapped[User] = relationship(back_populates="credentials", lazy="select")
+    passports: Mapped[list[AgentPassport]] = relationship(
         back_populates="api_credential", lazy="select"
     )

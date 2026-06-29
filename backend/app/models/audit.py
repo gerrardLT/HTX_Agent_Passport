@@ -63,10 +63,10 @@ class AuditEvent(Base, UUIDPrimaryKeyMixin, CreatedAtMixin):
     event_hash: Mapped[str] = mapped_column(Text, nullable=False)
 
     # ---- 关系 ----
-    user: Mapped["User"] = relationship(back_populates="audit_events", lazy="select")
-    passport: Mapped["AgentPassport | None"] = relationship(
+    user: Mapped[User] = relationship(back_populates="audit_events", lazy="select")
+    passport: Mapped[AgentPassport | None] = relationship(
         back_populates="audit_events", lazy="select"
     )
-    action: Mapped["AgentAction | None"] = relationship(
+    action: Mapped[AgentAction | None] = relationship(
         back_populates="audit_events", lazy="select"
     )

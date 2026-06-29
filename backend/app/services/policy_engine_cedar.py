@@ -424,9 +424,7 @@ def cedar_decision_matches_main(
 
     if cedar_decision == "Allow":
         # Cedar 放行 → 主路径不应在 Cedar 覆盖范围内拒绝
-        if main_verdict == "REJECT" and main_in_cedar_scope:
-            return False
-        return True
+        return not (main_verdict == "REJECT" and main_in_cedar_scope)
 
     if cedar_decision == "Deny":
         if main_verdict != "REJECT":

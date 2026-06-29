@@ -50,7 +50,6 @@ from app.services.audit_merkle_service import (
 from app.services.audit_sth_anchor import (
     AnchorBackend,
     NullAnchorBackend,
-    anchor_sth_to_file,
     get_default_anchor_backend,
 )
 
@@ -63,7 +62,7 @@ logger = logging.getLogger(__name__)
 SessionFactory = Callable[[], Session]
 
 
-def _list_chains(db: Session) -> list[tuple["UUID", "UUID | None"]]:
+def _list_chains(db: Session) -> list[tuple[UUID, UUID | None]]:
     """扫描 ``audit_events`` 找出所有不重复的 (user_id, passport_id) 组合。
 
     用 ``DISTINCT`` 直接交给 DB 处理，避免在 Python 层 dedupe 大表。
@@ -257,7 +256,7 @@ class STHScheduler:
         try:
             # 容忍 task 已结束（_run 自然退出后再调 stop）
             await asyncio.wait_for(self._task, timeout=self._interval * 2 + 1.0)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning("STH scheduler stop timed out, cancelling task")
             self._task.cancel()
             try:
@@ -294,7 +293,7 @@ class STHScheduler:
                 )
                 # 走到这里 = stop_event 被设 → 退出循环
                 return
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # 正常的"时间到，跑下一轮"
                 continue
 

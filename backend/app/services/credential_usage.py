@@ -187,13 +187,12 @@ def check_and_record_credential_use(
             cred.current_uses_today = 0
 
     # ---- Step 5: 限额检查 ----
-    if cred.max_uses_per_day is not None:
-        if cred.current_uses_today >= cred.max_uses_per_day:
-            raise CredentialUsageError(
-                "DAILY_LIMIT_EXCEEDED",
-                f"credential {credential_id} hit max_uses_per_day="
-                f"{cred.max_uses_per_day}",
-            )
+    if cred.max_uses_per_day is not None and cred.current_uses_today >= cred.max_uses_per_day:
+        raise CredentialUsageError(
+            "DAILY_LIMIT_EXCEEDED",
+            f"credential {credential_id} hit max_uses_per_day="
+            f"{cred.max_uses_per_day}",
+        )
 
     # ---- Step 6: 记录使用 ----
     cred.current_uses_today = (cred.current_uses_today or 0) + 1

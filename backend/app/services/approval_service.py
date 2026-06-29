@@ -22,18 +22,12 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import UTC, datetime, timedelta
-from typing import Any
 from uuid import UUID
 
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.state_machine import (
-    ACTION_TRANSITIONS,
-    IllegalStateTransition,
-    assert_transition,
-)
-from app.models import AgentAction, Approval, User
+from app.models import AgentAction, Approval
 from app.models.enums import ActionState, AuditEventType, PassportState
 from app.models.passport import AgentPassport
 from app.services.audit_writer import (
@@ -353,13 +347,13 @@ def submit_approval(
         and passport.version != action.policy_version_at_planning
     ):
         # 重裁决：调用 policy engine
+        from app.core.config import get_settings
+        from app.services.daily_history import aggregate_daily_history
+        from app.services.htx_adapter import get_fresh_seed_market_data
         from app.services.policy_engine import (
             GlobalConfig,
             evaluate_policy,
         )
-        from app.services.daily_history import aggregate_daily_history
-        from app.services.htx_adapter import get_fresh_seed_market_data
-        from app.core.config import get_settings
 
         settings = get_settings()
         global_config = GlobalConfig(

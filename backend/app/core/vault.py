@@ -134,7 +134,7 @@ class CredentialVault:
         if master_key is None:
             key = _load_master_key_from_settings()
         else:
-            if not isinstance(master_key, (bytes, bytearray)):
+            if not isinstance(master_key, bytes | bytearray):
                 raise InvalidMasterKeyError(
                     f"master_key must be bytes (got {type(master_key).__name__})."
                 )
@@ -192,7 +192,7 @@ class CredentialVault:
         """
         # 防御性长度检查：密文必须至少包含 nonce + 一个 GCM tag。
         # 长度不足时直接拒绝，避免把不合法输入交给 AES-GCM（行为未定义/异常类型不一致）。
-        if not isinstance(encrypted, (bytes, bytearray)):
+        if not isinstance(encrypted, bytes | bytearray):
             raise DecryptionError(
                 f"encrypted must be bytes (got {type(encrypted).__name__})."
             )

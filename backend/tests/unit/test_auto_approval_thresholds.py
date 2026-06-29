@@ -33,7 +33,6 @@ from app.services.policy_engine import (
     evaluate_policy,
 )
 
-
 # ---------------------------------------------------------------------------
 # 共享：构造 small_spot_executor-like policy + thresholds
 # ---------------------------------------------------------------------------

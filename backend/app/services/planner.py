@@ -36,11 +36,9 @@ mock planner 永远返回 :class:`ActionPlanV0`（合法），调用方代码扁
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from typing import Any, Final, Literal
 from uuid import UUID
 
@@ -188,7 +186,7 @@ class PlannerConfig:
     store_raw_response: bool = False
 
     @classmethod
-    def from_settings(cls) -> "PlannerConfig":
+    def from_settings(cls) -> PlannerConfig:
         """从 :func:`get_settings` 读取默认值。"""
         s = get_settings()
         return cls(

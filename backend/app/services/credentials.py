@@ -33,12 +33,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.core.envelope_vault import EnvelopeVault
 from app.core.state_machine import (
     CREDENTIAL_TRANSITIONS,
     assert_transition,
 )
-from app.core.vault import CredentialVault
-from app.core.envelope_vault import EnvelopeVault
 from app.models import ApiCredential
 from app.models.enums import AuditEventType, CredentialState
 from app.services.audit_writer import (

@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime, timedelta
-from typing import Any
 
 import pytest
 from sqlalchemy import select
@@ -31,13 +30,12 @@ from sqlalchemy import select
 from app.models import AgentAction, AgentPassport, Approval, AuditEvent, User
 from app.models.enums import ActionState, AuditEventType, PassportState
 from app.services.approval_service import (
+    DEFAULT_APPROVAL_EXPIRES_SECONDS,
     ActionNotInApprovalStateError,
-    ApprovalAlreadyProcessedError,
     ApprovalExpiredError,
     ApprovalInvalidConfirmationError,
     ApprovalNotFoundError,
     ApprovalPassportRevokedError,
-    DEFAULT_APPROVAL_EXPIRES_SECONDS,
     create_approval_request,
     scan_expired_approvals,
     submit_approval,
@@ -220,7 +218,7 @@ class TestCreateApprovalRequest:
 
         # 60s 过期
         expected_min = datetime.now(UTC) - timedelta(seconds=2)
-        expected_max = datetime.now(UTC) + timedelta(seconds=62)
+        datetime.now(UTC) + timedelta(seconds=62)
         assert expected_min + timedelta(seconds=60) <= approval.expires_at
 
     def test_writes_approval_requested_audit_event(self, db_session) -> None:

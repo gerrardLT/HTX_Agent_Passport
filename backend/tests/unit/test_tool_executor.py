@@ -20,7 +20,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from app.services.tool_executor import Batch, ToolCall, ToolExecutor, ToolResult
+from app.services.tool_executor import ToolCall, ToolExecutor
 
 
 @pytest.fixture

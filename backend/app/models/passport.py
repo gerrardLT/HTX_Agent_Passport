@@ -64,13 +64,13 @@ class AgentPassport(Base, UUIDPrimaryKeyMixin, CreatedAtMixin, UpdatedAtMixin):
     )
 
     # ---- 关系 ----
-    user: Mapped["User"] = relationship(back_populates="passports", lazy="select")
-    api_credential: Mapped["ApiCredential | None"] = relationship(
+    user: Mapped[User] = relationship(back_populates="passports", lazy="select")
+    api_credential: Mapped[ApiCredential | None] = relationship(
         back_populates="passports", lazy="select"
     )
-    actions: Mapped[list["AgentAction"]] = relationship(
+    actions: Mapped[list[AgentAction]] = relationship(
         back_populates="passport", lazy="select"
     )
-    audit_events: Mapped[list["AuditEvent"]] = relationship(
+    audit_events: Mapped[list[AuditEvent]] = relationship(
         back_populates="passport", lazy="select"
     )

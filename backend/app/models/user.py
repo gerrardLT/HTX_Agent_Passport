@@ -36,18 +36,18 @@ class User(Base, UUIDPrimaryKeyMixin, CreatedAtMixin, UpdatedAtMixin):
     role: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'user'"))
 
     # ---- 关系（lazy='select' 避免 N+1 全量预加载） ----
-    credentials: Mapped[list["ApiCredential"]] = relationship(
+    credentials: Mapped[list[ApiCredential]] = relationship(
         back_populates="user", lazy="select"
     )
-    passports: Mapped[list["AgentPassport"]] = relationship(
+    passports: Mapped[list[AgentPassport]] = relationship(
         back_populates="user", lazy="select"
     )
-    actions: Mapped[list["AgentAction"]] = relationship(
+    actions: Mapped[list[AgentAction]] = relationship(
         back_populates="user", lazy="select"
     )
-    approvals: Mapped[list["Approval"]] = relationship(
+    approvals: Mapped[list[Approval]] = relationship(
         back_populates="user", lazy="select"
     )
-    audit_events: Mapped[list["AuditEvent"]] = relationship(
+    audit_events: Mapped[list[AuditEvent]] = relationship(
         back_populates="user", lazy="select"
     )

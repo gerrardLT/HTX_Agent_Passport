@@ -31,8 +31,8 @@ from app.services.audit_writer import (
     ACTOR_TYPE_EXECUTOR,
     AuditWriter,
 )
-from app.services.htx_adapter import HTXAdapter
 from app.services.daily_history import aggregate_daily_history_for_update
+from app.services.htx_adapter import HTXAdapter
 from app.services.policy_engine import (
     GlobalConfig,
     evaluate_policy,

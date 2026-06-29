@@ -11,8 +11,9 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
-from typing import Any, Callable, Coroutine
+from typing import Any
 
 from app.services.htx_adapter import TOOL_METADATA
 
@@ -99,7 +100,7 @@ class ToolExecutor:
                     *[self._execute_one(call, executor_fn) for call in batch.calls],
                     return_exceptions=True,
                 )
-                for call, res in zip(batch.calls, batch_results):
+                for call, res in zip(batch.calls, batch_results, strict=False):
                     if isinstance(res, Exception):
                         results.append(
                             ToolResult(

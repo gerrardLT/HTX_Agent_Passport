@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -20,7 +18,7 @@ class ApprovalSubmitRequest(BaseModel):
 
     approved: bool
     typed_confirmation: str = Field(..., description="Must be 'APPROVE' when approved=true")
-    signature: Optional[str] = None
+    signature: str | None = None
 
 
 class ApprovalSubmitResponse(BaseModel):

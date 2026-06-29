@@ -30,6 +30,7 @@ if str(_BACKEND_DIR) not in sys.path:
 
 # Load .env file if present (for local development)
 from dotenv import load_dotenv  # noqa: E402
+
 load_dotenv(_BACKEND_DIR / ".env")
 
 # ---------------------------------------------------------------------------

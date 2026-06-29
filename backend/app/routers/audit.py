@@ -40,7 +40,8 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.dependencies import get_current_user, get_db
-from app.models import AgentAction, AuditEvent, User
+from app.core.sth_signing import get_public_key_hex, get_signing_algo
+from app.models import AuditEvent, User
 from app.schemas.audit import (
     AuditEventListResponse,
     AuditEventResponse,
@@ -56,7 +57,6 @@ from app.services.audit_merkle_service import (
     make_inclusion_proof,
 )
 from app.services.audit_sth_anchor import anchor_sth_to_file
-from app.core.sth_signing import get_public_key_hex, get_signing_algo
 
 router = APIRouter()
 

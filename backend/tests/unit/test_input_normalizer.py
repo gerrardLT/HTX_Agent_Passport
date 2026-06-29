@@ -12,8 +12,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-import pytest
-
 from app.services.context_builder import (
     MAX_TOKENS,
     PlannerContext,
@@ -21,7 +19,6 @@ from app.services.context_builder import (
     estimate_tokens,
 )
 from app.services.input_normalizer import (
-    NormalizedInput,
     build_blocked_action_plan,
     normalize_and_route,
 )

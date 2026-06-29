@@ -36,9 +36,8 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -339,7 +338,7 @@ class S3ObjectLockAnchorBackend(AnchorBackend):
 
         try:
             body = json.dumps(record, ensure_ascii=False, sort_keys=True).encode("utf-8")
-            retention_until = datetime.now(timezone.utc).replace(
+            retention_until = datetime.now(UTC).replace(
                 microsecond=0
             ) + _years(self.retention_years)
             self._client.put_object(
@@ -363,7 +362,7 @@ class S3ObjectLockAnchorBackend(AnchorBackend):
             return False
 
 
-def _years(n: int) -> "_TimedeltaYears":
+def _years(n: int) -> _TimedeltaYears:
     """返回 n 年的 timedelta-like 值——用 Python 标准库逼近 365 天/年。
 
     精确"年"在 calendar 层有闰年问题；锚定 retention 不需要纳秒级精度，

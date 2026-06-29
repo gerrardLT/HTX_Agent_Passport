@@ -34,7 +34,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.merkle import (
-    HASH_HEX_LEN,
     consistency_proof,
     event_hash_to_leaf,
     inclusion_proof,

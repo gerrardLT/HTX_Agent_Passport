@@ -128,7 +128,7 @@ class LocalKeyProvider(KeyProvider):
 
     @staticmethod
     def _validate_kek(key: bytes) -> bytes:
-        if not isinstance(key, (bytes, bytearray)):
+        if not isinstance(key, bytes | bytearray):
             raise KeyProviderError(
                 f"KEK must be bytes (got {type(key).__name__})."
             )

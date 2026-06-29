@@ -54,9 +54,9 @@ class ExecutionResult(Base, UUIDPrimaryKeyMixin, CreatedAtMixin):
     status: Mapped[str] = mapped_column(Text, nullable=False)
 
     # ---- 关系 ----
-    action: Mapped["AgentAction"] = relationship(
+    action: Mapped[AgentAction] = relationship(
         back_populates="execution_results", lazy="select"
     )
-    model_call: Mapped["ModelCall | None"] = relationship(
+    model_call: Mapped[ModelCall | None] = relationship(
         back_populates="execution_results", lazy="select"
     )

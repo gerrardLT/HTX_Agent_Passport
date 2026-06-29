@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import hashlib
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 
 import pytest
 from sqlalchemy.orm import Session
@@ -38,7 +38,6 @@ from app.services.audit_merkle_service import (
     AuditMerkleError,
     get_latest_sth,
     issue_signed_tree_head,
-    make_consistency_proof,
     make_inclusion_proof,
     verify_event_inclusion,
     verify_sth_against_chain,

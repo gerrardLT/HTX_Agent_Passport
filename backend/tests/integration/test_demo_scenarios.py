@@ -18,7 +18,7 @@ from app.services.demo_scenarios import (
     run_over_limit_scenario,
     run_reject_scenario,
 )
-from app.services.seed_data import SEED_USER_WALLET, load_seed_data
+from app.services.seed_data import load_seed_data
 
 pytestmark = pytest.mark.integration
 

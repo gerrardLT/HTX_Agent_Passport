@@ -77,19 +77,19 @@ class AgentAction(Base, UUIDPrimaryKeyMixin, CreatedAtMixin, UpdatedAtMixin):
     checkpoint_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
 
     # ---- 关系 ----
-    passport: Mapped["AgentPassport"] = relationship(
+    passport: Mapped[AgentPassport] = relationship(
         back_populates="actions", lazy="select"
     )
-    user: Mapped["User"] = relationship(back_populates="actions", lazy="select")
-    approvals: Mapped[list["Approval"]] = relationship(
+    user: Mapped[User] = relationship(back_populates="actions", lazy="select")
+    approvals: Mapped[list[Approval]] = relationship(
         back_populates="action", lazy="select"
     )
-    execution_results: Mapped[list["ExecutionResult"]] = relationship(
+    execution_results: Mapped[list[ExecutionResult]] = relationship(
         back_populates="action", lazy="select"
     )
-    model_calls: Mapped[list["ModelCall"]] = relationship(
+    model_calls: Mapped[list[ModelCall]] = relationship(
         back_populates="action", lazy="select"
     )
-    audit_events: Mapped[list["AuditEvent"]] = relationship(
+    audit_events: Mapped[list[AuditEvent]] = relationship(
         back_populates="action", lazy="select"
     )

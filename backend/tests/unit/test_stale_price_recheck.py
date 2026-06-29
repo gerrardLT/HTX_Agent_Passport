@@ -53,7 +53,6 @@ from app.services.stale_price_check import (
     check_market_snapshot_freshness_and_slippage,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers / fixtures（与现有测试风格一致）
 # ---------------------------------------------------------------------------
@@ -611,12 +610,12 @@ class TestExecutionGatewayIntegration:
         self, db_session: Session, monkeypatch
     ) -> None:
         """SEED_MARKET_DATA.as_of=2024-06-15 → 现在远超 60s → MARKET_SNAPSHOT_STALE。
-    
+
         这其实是 G16 在生产中希望发生的行为：种子数据时间永远过期，开发者必须
         接入实时数据才能成交（强制刷新），杜绝“按种子数据成交”的资金风险。
         """
-        from app.services.htx_adapter import SEED_MARKET_DATA
         from app.services.execution_gateway import ExecutionGateway
+        from app.services.htx_adapter import SEED_MARKET_DATA
         monkeypatch.setattr(
             ExecutionGateway, "_get_market_snapshot",
             lambda self: SEED_MARKET_DATA,

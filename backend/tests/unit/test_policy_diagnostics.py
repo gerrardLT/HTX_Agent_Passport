@@ -31,7 +31,6 @@ from app.services.policy_engine import (
     GlobalConfig,
 )
 
-
 _FIXED_NOW = datetime(2026, 5, 31, 12, 0, 0, tzinfo=UTC)
 
 

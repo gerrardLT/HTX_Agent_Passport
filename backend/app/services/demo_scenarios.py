@@ -18,7 +18,7 @@ from app.models.enums import ActionState, AuditEventType
 from app.schemas.action_plan import validate_action_plan_schema
 from app.services.audit_writer import ACTOR_TYPE_SYSTEM, AuditWriter
 from app.services.input_normalizer import build_blocked_action_plan, normalize_and_route
-from app.services.seed_data import SEED_MARKET_DATA, SEED_TASKS
+from app.services.seed_data import SEED_TASKS
 
 
 def _create_action(

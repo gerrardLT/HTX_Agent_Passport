@@ -23,6 +23,11 @@
 
 from __future__ import annotations
 
+from app.models.action import AgentAction
+from app.models.approval import Approval
+from app.models.audit import AuditEvent
+from app.models.audit_tree_head import AuditTreeHead
+
 # 基础设施
 from app.models.base import (
     Base,
@@ -30,6 +35,7 @@ from app.models.base import (
     UpdatedAtMixin,
     UUIDPrimaryKeyMixin,
 )
+from app.models.credential import ApiCredential
 
 # 状态/事件常量
 from app.models.enums import (
@@ -38,19 +44,14 @@ from app.models.enums import (
     CredentialState,
     PassportState,
 )
+from app.models.execution import ExecutionResult
+from app.models.model_call import ModelCall
+from app.models.passport import AgentPassport
 
 # ORM 模型
 # 顺序：先 User，再凭证 / 护照，再 ModelCall，再 Action，
 # 最后 Approval / ExecutionResult / AuditEvent。
 from app.models.user import User
-from app.models.credential import ApiCredential
-from app.models.passport import AgentPassport
-from app.models.model_call import ModelCall
-from app.models.action import AgentAction
-from app.models.approval import Approval
-from app.models.execution import ExecutionResult
-from app.models.audit import AuditEvent
-from app.models.audit_tree_head import AuditTreeHead
 
 __all__ = [
     # 基础

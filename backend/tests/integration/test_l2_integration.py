@@ -48,13 +48,11 @@ from app.models import (
     AgentPassport,
     AuditEvent,
     ExecutionResult,
-    ModelCall,
     User,
 )
 from app.models.enums import ActionState, AuditEventType, PassportState
 from app.services.approval_service import create_approval_request, submit_approval
 from app.services.audit_writer import (
-    ACTOR_TYPE_SYSTEM,
     ACTOR_TYPE_USER,
     AuditWriter,
 )
@@ -103,9 +101,10 @@ FIXED_NOW = datetime(2026, 5, 30, 12, 0, 0, tzinfo=UTC)
 # G16 自身的端到端覆盖在 :mod:`tests.unit.test_stale_price_recheck` 中完成。
 @pytest.fixture(autouse=True)
 def _fresh_seed_market_data(monkeypatch: pytest.MonkeyPatch) -> None:
+    import sys
+
     from app.services import htx_adapter as _htx
     from app.services import seed_data as _seed_data
-    import sys
 
     fresh_now_iso = datetime.now(UTC).isoformat()
     fresh_htx = {

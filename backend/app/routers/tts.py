@@ -17,7 +17,6 @@ import base64
 import logging
 import time
 import uuid
-from typing import Optional
 
 import websockets
 from fastapi import APIRouter, HTTPException
@@ -49,7 +48,7 @@ MODEL = "seed-tts-2.0-standard"  # 内置音色默认模型版本
 class TTSSynthesizeRequest(BaseModel):
     """TTS 合成请求体。"""
     text: str = Field(..., min_length=1, max_length=2000, description="待合成的中文文本。")
-    voice_id: Optional[str] = Field(
+    voice_id: str | None = Field(
         default=None,
         description="声音 ID（speaker）；为空时使用服务端默认配置。",
     )
@@ -74,7 +73,7 @@ class TTSBatchSegment(BaseModel):
 class TTSBatchRequest(BaseModel):
     """批量合成请求体 — 同一连接中顺序合成所有段落。"""
     segments: list[TTSBatchSegment] = Field(..., min_length=1, max_length=50)
-    voice_id: Optional[str] = Field(default=None)
+    voice_id: str | None = Field(default=None)
     speed_ratio: float = Field(default=1.0, ge=0.5, le=2.0)
     volume_ratio: float = Field(default=1.0, ge=0.5, le=2.0)
     pitch_ratio: float = Field(default=1.0, ge=0.5, le=2.0)
@@ -173,7 +172,7 @@ async def _ws_synthesize(
             recv_timeout = audio_recv_timeout if got_audio else WS_TIMEOUT
             try:
                 msg = await asyncio.wait_for(ws.recv(), timeout=recv_timeout)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 if got_audio:
                     # 音频已接收完毕，服务端不再发送更多消息 → 正常结束
                     logger.info("TTS WS audio complete (no more messages after %.1fs)", audio_recv_timeout)

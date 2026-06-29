@@ -93,7 +93,7 @@ class EnvelopeVault:
     # ------------------------------------------------------------------ decrypt
     def decrypt(self, blob: bytes) -> str:
         """解密信封密文；非信封格式回退到旧 CredentialVault 单层解密。"""
-        if not isinstance(blob, (bytes, bytearray)):
+        if not isinstance(blob, bytes | bytearray):
             raise DecryptionError(
                 f"encrypted must be bytes (got {type(blob).__name__})."
             )
@@ -166,7 +166,7 @@ class EnvelopeVault:
 
     def needs_rewrap(self, blob: bytes) -> bool:
         """判断密文是否需要 re-wrap（旧格式或 KEK 版本落后）。"""
-        if not isinstance(blob, (bytes, bytearray)):
+        if not isinstance(blob, bytes | bytearray):
             return False
         blob = bytes(blob)
         if not blob.startswith(_MAGIC):

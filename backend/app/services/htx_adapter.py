@@ -26,7 +26,6 @@ from urllib.parse import urlencode
 
 import httpx
 
-
 logger = logging.getLogger(__name__)
 
 

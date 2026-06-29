@@ -18,7 +18,7 @@ from __future__ import annotations
 import importlib.util
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -239,7 +239,7 @@ class TestBasicCrud:
             user_id=user.id,
             approval_type="typed_confirmation",
             approved=None,
-            expires_at=datetime.now(timezone.utc),
+            expires_at=datetime.now(UTC),
         )
         model_call = ModelCall(
             action_id=action.id,

@@ -26,7 +26,6 @@ import pytest
 from sqlalchemy import select
 
 from app.core.state_machine import IllegalStateTransition
-from app.core.vault import CredentialVault
 from app.models import ApiCredential, AuditEvent, User
 from app.models.enums import AuditEventType, CredentialState
 from app.services import credentials as svc

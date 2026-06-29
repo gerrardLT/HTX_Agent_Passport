@@ -29,7 +29,6 @@ import pytest
 from sqlalchemy import create_engine, event
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session, sessionmaker
 
 # ---------------------------------------------------------------------------
 # 1. SQLite 兼容层：把 PostgreSQL 专用类型映射为 SQLite 等价物
@@ -41,8 +40,8 @@ from sqlalchemy.orm import Session, sessionmaker
 # 这里采用最小侵入的做法：在 fixture 创建 SQLite 引擎前，
 # 给 PG 专用类型注册一个 ``compile`` 函数，让它们在 SQLite 方言下输出兼容 SQL。
 # 仅在测试环境生效，不影响生产 PG 迁移。
-
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.orm import Session, sessionmaker
 
 
 @compiles(UUID, "sqlite")
@@ -104,7 +103,7 @@ if not getattr(ARRAY, "_htx_sqlite_shim_installed", False):
             def process(value):  # type: ignore[no-untyped-def]
                 if value is None:
                     return None
-                if isinstance(value, (bytes, bytearray)):
+                if isinstance(value, bytes | bytearray):
                     value = value.decode("utf-8")
                 if isinstance(value, str):
                     return _json.loads(value)
@@ -125,9 +124,7 @@ if not getattr(ARRAY, "_htx_sqlite_shim_installed", False):
 #: 在 ``create_all`` 之前临时替换元数据中不兼容的 server_default，
 #: 测试结束后恢复原值（不影响生产 PostgreSQL 路径）。
 
-from sqlalchemy import text as _sa_text
 from sqlalchemy.schema import ColumnDefault as _ColumnDefault
-from sqlalchemy.sql import func as _sa_func
 
 
 def _patch_metadata_for_sqlite(metadata):
@@ -316,7 +313,7 @@ def _clear_module_caches() -> Iterator[None]:
 
 
 @pytest.fixture()
-def client(sqlite_engine: Engine) -> Iterator["TestClient"]:
+def client(sqlite_engine: Engine) -> Iterator[TestClient]:
     """FastAPI TestClient，``get_db`` 被重定向到 in-memory SQLite。
 
     每个用例：

@@ -43,7 +43,6 @@ from app.services.policy_validator import (
     validate_policy_dsl,
 )
 
-
 # 防御性 blocked_actions 必含的 4 个枚举值（withdraw / borrow / margin / transfer_out）。
 # 即便 capabilities 已禁用 place_order，也要靠 blocked_actions 形成第二道闸。
 EXPECTED_BLOCKED: set[str] = {"withdraw", "borrow", "margin", "transfer_out"}

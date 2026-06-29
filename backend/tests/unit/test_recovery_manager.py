@@ -31,7 +31,6 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -41,7 +40,6 @@ from app.services.recovery_manager import (
     Checkpoint,
     LoopDetector,
     RecoveryManager,
-    RetryDecision,
 )
 
 

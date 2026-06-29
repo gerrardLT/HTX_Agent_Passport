@@ -37,7 +37,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import time
 from unittest.mock import AsyncMock, patch
 
@@ -45,8 +44,6 @@ import httpx
 import pytest
 
 from app.services.htx_adapter import (
-    HTX_ERROR_MAP,
-    SEED_MARKET_DATA,
     TOOL_METADATA,
     AccountBalance,
     HTXAdapter,
@@ -55,7 +52,6 @@ from app.services.htx_adapter import (
     TickerResult,
     TokenBucketRateLimiter,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
