@@ -9,9 +9,10 @@ Thumbs.db
 *.pid
 
 # 真实环境变量（绝不入库）；保留 .env.example
+# .env.* 覆盖 .env.prod / .env.local / .env.production 等所有变体；
+# 生产部署使用服务器上预置的 .env.prod，仓库内不保存任何真实环境文件。
 .env
-.env.local
-.env.*.local
+.env.*
 !.env.example
 
 # =============================================================================
