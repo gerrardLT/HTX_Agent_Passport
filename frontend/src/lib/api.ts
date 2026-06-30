@@ -8,15 +8,17 @@
 /**
  * 取得后端基址。
  *
- * 生产环境：始终返回空字符串（同域相对路径）。
- * 前端所有接口 path 已自带 /api 前缀（如 /api/passports），
- * 浏览器发出 /api/passports → 由 nginx 转发到后端。
+ * 生产部署：返回空字符串（同域相对路径），前端 /api/* 请求由 nginx 转发到后端。
+ * 本地开发：返回 http://localhost:8000（直连后端）。
  *
- * 本地开发：.env.local 设置 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000，
- * 该值会被 Next.js 在构建/开发时内联，优先级高于此硬编码空串。
+ * 判断依据：如果当前页面 URL 是 localhost，说明是本地开发环境，直连后端 8000。
+ * 否则一律用相对路径。不再依赖 process.env（Next.js 对空值 NEXT_PUBLIC 变量的内联行为不可靠）。
  */
 export function getApiBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_API_BASE_URL || '';
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:8000';
+  }
+  return '';
 }
 
 export class ApiError extends Error {
