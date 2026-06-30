@@ -21,6 +21,8 @@ services:
     image: ghcr.io/gerrardlt/htx_agent_passport-backend:${IMAGE_TAG:-latest}
     container_name: htx_passport_backend
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
     environment:
       # Neon 托管 PostgreSQL 连接串（含 ?sslmode=require），由 .env.prod 注入
       DATABASE_URL: ${DATABASE_URL}
@@ -51,22 +53,9 @@ services:
     image: ghcr.io/gerrardlt/htx_agent_passport-frontend:${IMAGE_TAG:-latest}
     container_name: htx_passport_frontend
     restart: unless-stopped
-    depends_on:
-      - backend
-    networks:
-      - internal
-
-  # ─── Nginx 反向代理 ──────────────────────────────────────────────────────
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: htx_passport_nginx
-    restart: unless-stopped
     ports:
-      - "${HTTP_PORT:-80}:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - "127.0.0.1:3000:3000"
     depends_on:
-      - frontend
       - backend
     networks:
       - internal
