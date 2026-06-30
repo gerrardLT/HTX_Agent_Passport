@@ -8,19 +8,15 @@
 /**
  * 取得后端基址。
  *
- * 策略（零 localhost 泄漏）：
- * - 浏览器端：始终返回 ''（空字符串 = 同域相对路径），由 nginx 转发 /api → backend。
- * - 服务端（SSR / standalone server.js）：返回 Docker 内网地址 http://backend:8000，
- *   确保服务端 fetch 能通（Next.js standalone 容器与 backend 容器同处 Docker 网络）。
- * - 显式 NEXT_PUBLIC_API_BASE_URL 配置时优先使用（本地开发 .env.local → http://localhost:8000）。
+ * 生产环境：始终返回空字符串（同域相对路径）。
+ * 前端所有接口 path 已自带 /api 前缀（如 /api/passports），
+ * 浏览器发出 /api/passports → 由 nginx 转发到后端。
+ *
+ * 本地开发：.env.local 设置 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000，
+ * 该值会被 Next.js 在构建/开发时内联，优先级高于此硬编码空串。
  */
 export function getApiBaseUrl(): string {
-  const explicit = process.env.NEXT_PUBLIC_API_BASE_URL;
-  if (explicit) return explicit;
-  // 浏览器端：同域相对路径（前端 path 已带 /api 前缀）
-  if (typeof window !== 'undefined') return '';
-  // 服务端：Docker 内网后端地址（compose service name）
-  return 'http://backend:8000';
+  return process.env.NEXT_PUBLIC_API_BASE_URL || '';
 }
 
 export class ApiError extends Error {
