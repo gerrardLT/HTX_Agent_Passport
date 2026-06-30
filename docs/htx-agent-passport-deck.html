@@ -11,6 +11,18 @@
   --brand:#5e6ad2;--brand-light:#7c85e8;--brand-bg:rgba(94,106,210,.12);
   --t1:#f0f1f4;--t2:#a8adb8;--t3:#6b7080;
   --green:#27c93f;--yellow:#ffbd2e;--red:#ff5f56;
+
+  /* 渐变体系扩展 */
+  --grad-tint: #8b94f0;
+  --grad-shade: #3d4494;
+  --grad-warm: #d25e8a;
+  --grad-cool: #5ecdd2;
+
+  /* 预定义渐变 */
+  --gradient-brand: linear-gradient(135deg, var(--grad-shade), var(--brand), var(--grad-tint));
+  --gradient-flow: linear-gradient(90deg, var(--grad-cool), var(--brand), var(--grad-warm));
+  --gradient-glow: radial-gradient(ellipse, rgba(94,106,210,.2), rgba(124,133,232,.1), transparent 70%);
+  --gradient-shimmer: linear-gradient(90deg, transparent, rgba(94,106,210,.3), transparent);
 }
 html,body{width:1920px;height:1080px;overflow:hidden;font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--t1)}
 .deck{width:1920px;height:1080px;position:relative}
@@ -34,7 +46,7 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 .flow-node{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 24px;font-size:16px;font-weight:500;white-space:nowrap}
 .flow-node.active{border-color:var(--brand);background:var(--brand-bg);color:var(--brand-light)}
 .flow-arrow{color:var(--t3);font-size:20px}
-.hero-glow{position:absolute;top:-200px;left:30%;width:800px;height:600px;background:radial-gradient(ellipse,rgba(94,106,210,.15),transparent 70%);pointer-events:none}
+.hero-glow{position:absolute;top:-200px;left:30%;width:800px;height:600px;background:radial-gradient(ellipse at 40% 30%, rgba(94,106,210,.2), transparent 50%),radial-gradient(ellipse at 60% 70%, rgba(124,133,232,.1), transparent 50%),radial-gradient(ellipse at 50% 50%, rgba(94,106,210,.08), transparent 70%);pointer-events:none}
 .stat-row{display:flex;gap:48px;margin-top:48px}
 .stat{text-align:left}
 .stat .val{font-size:56px;font-weight:800;color:var(--t1)}
@@ -42,9 +54,9 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 .defense{display:flex;gap:24px;margin-top:40px}
 .defense-item{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;position:relative;overflow:hidden}
 .defense-item::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.defense-item:nth-child(1)::before{background:var(--green)}
-.defense-item:nth-child(2)::before{background:var(--yellow)}
-.defense-item:nth-child(3)::before{background:var(--red)}
+.defense-item:nth-child(1)::before{background:linear-gradient(90deg, var(--green), var(--brand))}
+.defense-item:nth-child(2)::before{background:linear-gradient(90deg, var(--yellow), var(--brand))}
+.defense-item:nth-child(3)::before{background:linear-gradient(90deg, var(--red), var(--brand))}
 .defense-item .layer{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:12px}
 .defense-item h3{font-size:20px;color:var(--t1);margin-bottom:8px}
 .defense-item p{font-size:15px;color:var(--t3)}
@@ -61,6 +73,98 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 .controls{position:fixed;bottom:36px;right:60px;display:flex;gap:8px;z-index:100}
 .controls button{width:36px;height:36px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--t2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .controls button:hover{border-color:var(--brand);color:var(--brand)}
+
+/* === Entry Animation System === */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, opacity;
+}
+
+[data-animate].animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.slide-exit [data-animate] {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition-duration: 300ms;
+  transition-delay: 0ms !important;
+}
+
+/* === Micro Animation Keyframes === */
+@keyframes pulse-glow {
+  0%, 100% { text-shadow: 0 0 0 transparent; }
+  50% { text-shadow: 0 0 20px rgba(94,106,210,.4), 0 0 40px rgba(94,106,210,.2); }
+}
+
+@keyframes flow-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 transparent; }
+  50% { box-shadow: inset 0 0 12px rgba(94,106,210,.15); }
+}
+
+@keyframes active-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(94,106,210,.3), inset 0 0 4px rgba(94,106,210,.1); }
+  50% { box-shadow: 0 0 20px rgba(94,106,210,.5), inset 0 0 8px rgba(94,106,210,.2); }
+}
+
+.micro-pulse { animation: pulse-glow 3s ease-in-out infinite; }
+.micro-flow { animation: flow-pulse 2.5s ease-in-out infinite; }
+.micro-glow { animation: active-glow 2s ease-in-out infinite; }
+
+/* === Title Gradient Animation === */
+.title-gradient {
+  background: linear-gradient(90deg, var(--grad-shade), var(--brand), var(--grad-tint), var(--grad-cool), var(--brand));
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-flow 4.5s linear infinite;
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+@supports not (-webkit-background-clip: text) {
+  .title-gradient {
+    background: none;
+    -webkit-text-fill-color: var(--t1);
+    color: var(--t1);
+  }
+}
+
+/* === Background Grid Texture === */
+.deck::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(94,106,210,.03) 1px, transparent 1px),linear-gradient(90deg, rgba(94,106,210,.03) 1px, transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0}
+
+/* === Card Border Shimmer === */
+@keyframes border-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.card-shimmer {
+  position: relative;
+}
+
+.card-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(90deg, transparent, rgba(94,106,210,.4), transparent);
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: border-shimmer 3s linear infinite;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -69,10 +173,10 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 <!-- Slide 1: Cover -->
 <div class="slide active">
   <div class="hero-glow"></div>
-  <div class="label">HTX Genesis Hackathon 2026</div>
-  <h1 style="margin-bottom:24px">HTX Agent Passport</h1>
-  <p style="font-size:28px;color:var(--t2);max-width:800px">权限、风险、审计三位一体<br>面向加密货币交易的 AI 代理零信任执行框架</p>
-  <div class="stat-row">
+  <div class="label" data-animate>HTX Genesis Hackathon 2026</div>
+  <h1 class="title-gradient" data-animate style="margin-bottom:24px">HTX Agent Passport</h1>
+  <p data-animate style="font-size:28px;color:var(--t2);max-width:800px">权限、风险、审计三位一体<br>面向加密货币交易的 AI 代理零信任执行框架</p>
+  <div class="stat-row" data-animate>
     <div class="stat"><div class="val">3</div><div class="desc">纵深安全防线</div></div>
     <div class="stat"><div class="val">7</div><div class="desc">策略裁决步骤</div></div>
     <div class="stat"><div class="val">100%</div><div class="desc">操作可审计</div></div>
@@ -83,20 +187,20 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 
 <!-- Slide 2: Problem -->
 <div class="slide">
-  <div class="label">问题</div>
-  <h2>当 AI 操作真金白银<br>谁来确保它不犯错？</h2>
-  <div class="grid-3">
-    <div class="card">
+  <div class="label" data-animate>问题</div>
+  <h2 data-animate>当 AI 操作真金白银<br>谁来确保它不犯错？</h2>
+  <div class="grid-3" data-animate>
+    <div class="card card-shimmer">
       <div class="num">$2.1B</div>
       <h3>2025 DeFi 安全损失</h3>
       <p>AI 代理参与交易引入新攻击面——幻觉、prompt 注入、权限越界</p>
     </div>
-    <div class="card">
+    <div class="card card-shimmer">
       <div class="num">0</div>
       <h3>现有安全框架</h3>
       <p>市场上没有专门面向 AI 代理的零信任执行控制框架</p>
     </div>
-    <div class="card">
+    <div class="card card-shimmer">
       <div class="num">∞</div>
       <h3>信任黑洞</h3>
       <p>用户给 AI 全权限 API Key，无法限制操作范围、无审计追溯</p>
@@ -107,10 +211,10 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 
 <!-- Slide 3: Solution -->
 <div class="slide">
-  <div class="label">解决方案</div>
-  <h2>零信任执行框架</h2>
-  <p style="font-size:24px;margin-bottom:32px">LLM 的输出只是提案——每一笔操作须经确定性策略引擎裁决后方可执行。AI 永远不能绕过策略边界。</p>
-  <div class="flow">
+  <div class="label" data-animate>解决方案</div>
+  <h2 data-animate>零信任执行框架</h2>
+  <p data-animate style="font-size:24px;margin-bottom:32px">LLM 的输出只是提案——每一笔操作须经确定性策略引擎裁决后方可执行。AI 永远不能绕过策略边界。</p>
+  <div class="flow" data-animate>
     <div class="flow-node">自然语言任务</div>
     <div class="flow-arrow">→</div>
     <div class="flow-node">规则路由拦截</div>
@@ -125,7 +229,7 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
     <div class="flow-arrow">→</div>
     <div class="flow-node">审计上链</div>
   </div>
-  <div style="margin-top:48px">
+  <div data-animate style="margin-top:48px">
     <div class="tag">确定性裁决</div>
     <div class="tag">不依赖 LLM 判断</div>
     <div class="tag">抗 Prompt 注入</div>
@@ -137,9 +241,9 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 
 <!-- Slide 4: Architecture -->
 <div class="slide">
-  <div class="label">架构</div>
-  <h2>四层架构：感知 → 决策 → 执行 → 反馈</h2>
-  <div class="arch-layer">
+  <div class="label" data-animate>架构</div>
+  <h2 data-animate>四层架构：感知 → 决策 → 执行 → 反馈</h2>
+  <div class="arch-layer" data-animate>
     <div class="arch-col">
       <div class="layer-name">感知层</div>
       <ul>
@@ -180,10 +284,10 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 
 <!-- Slide 5: Three Defense Lines -->
 <div class="slide">
-  <div class="label">安全</div>
-  <h2>三道纵深防线</h2>
-  <p>每一层独立运作、互为冗余。即使某一层失效，后续层仍能拦截风险。</p>
-  <div class="defense">
+  <div class="label" data-animate>安全</div>
+  <h2 data-animate>三道纵深防线</h2>
+  <p data-animate>每一层独立运作、互为冗余。即使某一层失效，后续层仍能拦截风险。</p>
+  <div class="defense" data-animate>
     <div class="defense-item">
       <div class="layer">Layer 01</div>
       <h3>规则路由拦截</h3>
@@ -205,24 +309,24 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 
 <!-- Slide 6: Core Features -->
 <div class="slide">
-  <div class="label">功能</div>
-  <h2>六大核心能力</h2>
-  <div class="grid-3">
-    <div class="card"><h3>⊘ 零信任执行</h3><p>LLM 输出仅是提案，必须经过 Policy Engine 确定性裁决</p></div>
-    <div class="card"><h3>⧫ 信封加密</h3><p>API 密钥 AES-256-GCM 加密存储，运行时解密、用后即焚</p></div>
-    <div class="card"><h3>⌬ Merkle 审计链</h3><p>哈希链 + STH 锚定，O(log N) inclusion proof，不可篡改</p></div>
-    <div class="card"><h3>☰ 人工审批兜底</h3><p>高危操作触发 HITL 审批，超时自动过期</p></div>
-    <div class="card"><h3>◎ 策略热更新</h3><p>限额/币种/时间窗口运行时调整，无需重启</p></div>
-    <div class="card"><h3>⟁ Stale Price 防护</h3><p>审批到执行间市场波动检测，超阈值阻断</p></div>
+  <div class="label" data-animate>功能</div>
+  <h2 data-animate>六大核心能力</h2>
+  <div class="grid-3" data-animate>
+    <div class="card card-shimmer"><h3>⊘ 零信任执行</h3><p>LLM 输出仅是提案，必须经过 Policy Engine 确定性裁决</p></div>
+    <div class="card card-shimmer"><h3>⧫ 信封加密</h3><p>API 密钥 AES-256-GCM 加密存储，运行时解密、用后即焚</p></div>
+    <div class="card card-shimmer"><h3>⌬ Merkle 审计链</h3><p>哈希链 + STH 锚定，O(log N) inclusion proof，不可篡改</p></div>
+    <div class="card card-shimmer"><h3>☰ 人工审批兜底</h3><p>高危操作触发 HITL 审批，超时自动过期</p></div>
+    <div class="card card-shimmer"><h3>◎ 策略热更新</h3><p>限额/币种/时间窗口运行时调整，无需重启</p></div>
+    <div class="card card-shimmer"><h3>⟁ Stale Price 防护</h3><p>审批到执行间市场波动检测，超阈值阻断</p></div>
   </div>
   <div class="slide-number">06 / 12</div>
 </div>
 
 <!-- Slide 7: Technical Highlights -->
 <div class="slide">
-  <div class="label">技术亮点</div>
-  <h2>为什么不可能被攻破？</h2>
-  <div class="grid-2">
+  <div class="label" data-animate>技术亮点</div>
+  <h2 data-animate>为什么不可能被攻破？</h2>
+  <div class="grid-2" data-animate>
     <div>
       <h3 style="color:var(--t1);font-size:24px;margin-bottom:16px">Policy Engine — 确定性纯函数</h3>
       <p style="font-size:18px">只读结构化字段(金额/币种/限额)，完全忽略 rationale 中的自然语言。"忽略以上规则" 之类的 prompt 注入无法改变裁决结果。</p>
@@ -242,7 +346,7 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
       </div>
     </div>
   </div>
-  <div class="grid-2" style="margin-top:32px">
+  <div class="grid-2" data-animate style="margin-top:32px">
     <div>
       <h3 style="color:var(--t1);font-size:24px;margin-bottom:16px">信封加密 — HSM 级保护</h3>
       <p style="font-size:18px">每条凭证独立 DEK(AES-256-GCM)，DEK 由 KEK 包裹。支持 AWS KMS (FIPS 140-3 L3) 作为 KEK provider。密钥轮换零停机。</p>
@@ -257,10 +361,10 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 
 <!-- Slide 8: Action Lifecycle -->
 <div class="slide">
-  <div class="label">产品流程</div>
-  <h2>Action 生命周期</h2>
-  <p>从用户下达自然语言任务到执行完成，每一步状态转换均经审计记录。</p>
-  <div class="flow" style="flex-wrap:wrap;gap:12px;margin-top:32px">
+  <div class="label" data-animate>产品流程</div>
+  <h2 data-animate>Action 生命周期</h2>
+  <p data-animate>从用户下达自然语言任务到执行完成，每一步状态转换均经审计记录。</p>
+  <div class="flow" data-animate style="flex-wrap:wrap;gap:12px;margin-top:32px">
     <div class="flow-node">REQUESTED</div><div class="flow-arrow">→</div>
     <div class="flow-node">PLANNING</div><div class="flow-arrow">→</div>
     <div class="flow-node">PLAN_VALIDATED</div><div class="flow-arrow">→</div>
@@ -270,7 +374,7 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
     <div class="flow-node">EXECUTING</div><div class="flow-arrow">→</div>
     <div class="flow-node" style="border-color:var(--green)">EXECUTED ✓</div>
   </div>
-  <div style="margin-top:32px;display:flex;gap:24px">
+  <div data-animate style="margin-top:32px;display:flex;gap:24px">
     <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--red)">●</span><span style="color:var(--t3);font-size:16px">RISK_CHECKING → AUTO_REJECTED (策略违规)</span></div>
     <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--red)">●</span><span style="color:var(--t3);font-size:16px">APPROVAL_REQUIRED → REJECTED_BY_USER</span></div>
     <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--yellow)">●</span><span style="color:var(--t3);font-size:16px">APPROVAL_REQUIRED → EXPIRED (超时)</span></div>
@@ -383,20 +487,209 @@ p{font-size:22px;line-height:1.6;color:var(--t2);max-width:900px}
 </div>
 
 <script>
-const slides=document.querySelectorAll('.slide');
-let current=0;
-function show(i){
-  slides.forEach((s,idx)=>{s.classList.toggle('active',idx===i)});
-  current=i;
-  document.querySelectorAll('.nav button').forEach((b,idx)=>{b.classList.toggle('active',idx===i)});
+// === Animation Orchestrator ===
+class AnimationOrchestrator {
+  constructor(options = {}) {
+    this.baseDelay = options.baseDelay || 80;
+    this.maxTotalDuration = options.maxTotalDuration || 1200;
+    this.elementDuration = options.elementDuration || 500;
+  }
+
+  /**
+   * 计算 stagger delay（自适应间隔 50-150ms，总时间 ≤ 1200ms）
+   * @param {number} index - 元素索引 (0-based)
+   * @param {number} total - 该 slide 内总元素数
+   * @returns {number} - 该元素的动画延迟(ms)
+   */
+  calculateDelay(index, total) {
+    const maxStagger = Math.min(
+      150,
+      Math.max(50, (this.maxTotalDuration - this.elementDuration) / Math.max(total - 1, 1))
+    );
+    return index * maxStagger;
+  }
+
+  /**
+   * 激活 slide 入场动画，为 [data-animate] 元素添加 animate-in class
+   * @param {HTMLElement} slide - 目标 slide 元素
+   */
+  animateEntry(slide) {
+    const elements = slide.querySelectorAll('[data-animate]');
+    const total = elements.length;
+    elements.forEach((el, i) => {
+      el.style.transitionDelay = `${this.calculateDelay(i, total)}ms`;
+      el.classList.add('animate-in');
+    });
+  }
+
+  /**
+   * 重置 slide 元素状态，移除 animate-in class 并重置 transitionDelay
+   * @param {HTMLElement} slide - 目标 slide 元素
+   */
+  resetSlide(slide) {
+    const elements = slide.querySelectorAll('[data-animate]');
+    elements.forEach(el => {
+      el.classList.remove('animate-in');
+      el.style.transitionDelay = '0ms';
+    });
+  }
 }
-function next(){if(current<slides.length-1)show(current+1)}
-function prev(){if(current>0)show(current-1)}
+
+// === Micro Animation Engine ===
+class MicroAnimationEngine {
+  constructor() {
+    this.activeAnimations = new Set();
+  }
+
+  /**
+   * 激活指定 slide 的微动画
+   * 为 .num 添加 micro-pulse，为 .flow-node 添加 micro-flow（递增 delay），
+   * 为 .flow-node.active 添加 micro-glow
+   * @param {HTMLElement} slide - 目标 slide 元素
+   */
+  activate(slide) {
+    // 数字脉冲
+    slide.querySelectorAll('.num').forEach(el => {
+      el.classList.add('micro-pulse');
+      this.activeAnimations.add(el);
+    });
+
+    // 流程节点顺序脉冲（递增 animation-delay）
+    const flowNodes = slide.querySelectorAll('.flow-node');
+    flowNodes.forEach((el, i) => {
+      el.style.animationDelay = `${i * 0.3}s`;
+      el.classList.add('micro-flow');
+      this.activeAnimations.add(el);
+    });
+
+    // 活跃节点 glow
+    slide.querySelectorAll('.flow-node.active').forEach(el => {
+      el.classList.add('micro-glow');
+      this.activeAnimations.add(el);
+    });
+  }
+
+  /**
+   * 暂停所有活跃微动画，移除所有微动画 class 并清空 activeAnimations Set
+   */
+  deactivate() {
+    this.activeAnimations.forEach(el => {
+      el.classList.remove('micro-pulse', 'micro-flow', 'micro-glow');
+      el.style.animationDelay = '';
+    });
+    this.activeAnimations.clear();
+  }
+}
+
+// === Transition Controller ===
+class TransitionController {
+  constructor(orchestrator) {
+    this.orchestrator = orchestrator;
+    this.isTransitioning = false;
+    this.exitDuration = 300; // ms
+  }
+
+  /**
+   * 执行 slide 切换（退出 → 切换状态 → 入场）
+   * isTransitioning 锁机制防止快速连续导航冲突
+   * @param {number} fromIndex - 当前 slide 索引
+   * @param {number} toIndex - 目标 slide 索引
+   * @param {HTMLElement[]} slides - 所有 slide 元素
+   */
+  async transition(fromIndex, toIndex, slides) {
+    if (this.isTransitioning) return;
+    if (fromIndex === toIndex) return;
+
+    this.isTransitioning = true;
+    const fromSlide = slides[fromIndex];
+    const toSlide = slides[toIndex];
+
+    // Phase 1: 退出当前 slide (300ms)
+    fromSlide.classList.add('slide-exit');
+    await this.wait(this.exitDuration);
+
+    // Phase 2: 切换显示状态
+    fromSlide.classList.remove('active', 'slide-exit');
+    this.orchestrator.resetSlide(fromSlide);
+
+    toSlide.classList.add('active');
+
+    // Phase 3: 入场新 slide
+    requestAnimationFrame(() => {
+      this.orchestrator.animateEntry(toSlide);
+      // 入场完成后解锁
+      setTimeout(() => {
+        this.isTransitioning = false;
+      }, this.orchestrator.maxTotalDuration);
+    });
+  }
+
+  /**
+   * Promise 化的等待工具
+   * @param {number} ms - 等待时间(毫秒)
+   * @returns {Promise<void>}
+   */
+  wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+}
+
+// === Init & Navigation ===
+function initDeckAnimations() {
+  const orchestrator = new AnimationOrchestrator({
+    baseDelay: 80,
+    maxTotalDuration: 1200,
+    elementDuration: 500
+  });
+  const microEngine = new MicroAnimationEngine();
+  const transitionCtrl = new TransitionController(orchestrator);
+  return { orchestrator, microEngine, transitionCtrl };
+}
+
+const { orchestrator, microEngine, transitionCtrl } = initDeckAnimations();
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+
+function updateNavDots(index) {
+  document.querySelectorAll('.nav button').forEach((b, idx) => {
+    b.classList.toggle('active', idx === index);
+  });
+}
+
+function showSlide(targetIndex) {
+  if (targetIndex === current) return;
+  if (targetIndex < 0 || targetIndex >= slides.length) return;
+  microEngine.deactivate();
+  transitionCtrl.transition(current, targetIndex, slides);
+  current = targetIndex;
+  updateNavDots(targetIndex);
+  // 入场完成后激活微动画
+  setTimeout(() => microEngine.activate(slides[targetIndex]), 800);
+}
+
+function next() { showSlide(current + 1); }
+function prev() { showSlide(current - 1); }
+
 // Build nav dots
-const nav=document.getElementById('nav');
-slides.forEach((_,i)=>{const b=document.createElement('button');b.onclick=()=>show(i);if(i===0)b.classList.add('active');nav.appendChild(b)});
-// Keyboard
-document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')next();if(e.key==='ArrowLeft')prev()});
+const nav = document.getElementById('nav');
+slides.forEach((_, i) => {
+  const b = document.createElement('button');
+  b.onclick = () => showSlide(i);
+  if (i === 0) b.classList.add('active');
+  nav.appendChild(b);
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') next();
+  if (e.key === 'ArrowLeft') prev();
+});
+
+// Initial animation on first slide
+requestAnimationFrame(() => {
+  orchestrator.animateEntry(slides[0]);
+  setTimeout(() => microEngine.activate(slides[0]), 800);
+});
 </script>
 </body>
 </html>

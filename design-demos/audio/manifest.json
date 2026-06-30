@@ -1,0 +1,42 @@
+{
+  "1": [
+    "audio/act1-0.mp3",
+    "audio/act1-1.mp3",
+    "audio/act1-2.mp3"
+  ],
+  "2": [
+    "audio/act2-0.mp3",
+    "audio/act2-1.mp3",
+    "audio/act2-2.mp3",
+    "audio/act2-3.mp3"
+  ],
+  "3": [
+    "audio/act3-0.mp3",
+    "audio/act3-1.mp3",
+    "audio/act3-2.mp3"
+  ],
+  "4": [
+    "audio/act4-0.mp3",
+    "audio/act4-1.mp3",
+    "audio/act4-2.mp3"
+  ],
+  "5": [
+    "audio/act5-0.mp3",
+    "audio/act5-1.mp3",
+    "audio/act5-2.mp3",
+    "audio/act5-3.mp3"
+  ],
+  "6": [
+    "audio/act6-0.mp3",
+    "audio/act6-1.mp3",
+    "audio/act6-2.mp3"
+  ],
+  "7": [
+    "audio/act7-0.mp3",
+    "audio/act7-1.mp3",
+    "audio/act7-2.mp3"
+  ],
+  "8": [
+    "audio/act8-0.mp3"
+  ]
+}

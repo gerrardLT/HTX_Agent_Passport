@@ -1065,7 +1065,7 @@ body {
 
 <div id="transition-overlay"></div>
 <div id="tts-preload-overlay">
-  <div id="tts-preload-title">🎙️ 正在预合成 AI 语音…</div>
+  <div id="tts-preload-title">🎙️ 正在加载音频资源…</div>
   <div id="tts-preload-bar-wrap"><div id="tts-preload-bar"></div></div>
   <div id="tts-preload-pct">0 / 22</div>
 </div>
@@ -1146,16 +1146,16 @@ const narrations = {
 };
 
 // ─── ACT DURATIONS (ms) ───
-// 每段 TTS ~10s + 2s 间隔；按最大段数 × 12s 预留
+// 每段 ~15s + 2s 间隔；按最大段数预留（放慢 50%）
 const ACT_DURATIONS = {
-  1: 45000,   // 3 segments
-  2: 60000,   // 4 segments
-  3: 45000,   // 3 segments
-  4: 45000,   // 3 segments
-  5: 60000,   // 4 segments
-  6: 45000,   // 3 segments
-  7: 45000,   // 3 segments
-  8: 15000,   // 1 segment
+  1: 67000,   // 3 segments（放慢 50%）
+  2: 90000,   // 4 segments（放慢 50%）
+  3: 67000,   // 3 segments（放慢 50%）
+  4: 67000,   // 3 segments（放慢 50%）
+  5: 90000,   // 4 segments（放慢 50%）
+  6: 67000,   // 3 segments（放慢 50%）
+  7: 67000,   // 3 segments（放慢 50%）
+  8: 22000,   // 1 segment（放慢 50%）
 };
 
 // ─── REVEAL SEQUENCES PER ACT ───
@@ -1363,68 +1363,22 @@ function runAuditChain() {
   }, 3800));
 }
 
-// ─── TTS 语音配音（火山引擎 AI 语音 · 预合成模式） ───
-const TTS_API_BASE = 'http://localhost:8010/api/tts';
+// ─── 本地预合成音频播放（无需 TTS API） ───
+const AUDIO_BASE_PATH = 'audio/'; // 本地音频文件路径
 let speechEnabled = true;
 let currentAudio = null;
-let selectedVoiceId = 'zh_female_vv_uranus_bigtts';
 let narrationToken = 0;
-let ttsAvailable = null;
 let narrationFinished = null;
 let actToken = 0;
 
-// 预合成音频缓存: "actNum-idx" → Blob
-const ttsAudioCache = new Map();
-let preSynthVoiceId = null; // 预合成时锁定的音色
-
-// 语音选择器（预合成前可切换，预合成后锁定）
-document.getElementById('voice-select').addEventListener('change', (e) => {
-  selectedVoiceId = e.target.value;
-});
-
-// 悬浮显示语音选择器
-document.getElementById('pip-avatar').addEventListener('mouseenter', () => {
-  if (speechEnabled) document.getElementById('voice-selector').classList.add('show');
-});
-document.getElementById('pip-avatar').addEventListener('mouseleave', () => {
-  setTimeout(() => document.getElementById('voice-selector').classList.remove('show'), 500);
-});
-
-// 调用后端 TTS API 获取音频 Blob
-async function fetchTTSAudio(text, voiceId) {
-  const resp = await fetch(`${TTS_API_BASE}/synthesize`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      text: text,
-      voice_id: voiceId || selectedVoiceId,
-      speed_ratio: 1.0,
-      volume_ratio: 1.0,
-      pitch_ratio: 1.0,
-      encoding: 'mp3',
-    }),
-  });
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err.detail || `TTS API error ${resp.status}`);
-  }
-  const data = await resp.json();
-  const binary = atob(data.audio_base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  const mimeType = data.encoding === 'wav' ? 'audio/wav' : 'audio/mpeg';
-  return new Blob([bytes], { type: mimeType });
-}
-
-// 播放音频 Blob，返回 Promise
-function playAudioBlob(blob) {
+// 播放本地音频文件，返回 Promise
+function playLocalAudio(src) {
   return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
+    const audio = new Audio(src);
     currentAudio = audio;
     audio.oncanplaythrough = () => { audio.play().catch(reject); };
-    audio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-    audio.onerror = (e) => { URL.revokeObjectURL(url); currentAudio = null; reject(e); };
+    audio.onended = () => { currentAudio = null; resolve(); };
+    audio.onerror = (e) => { currentAudio = null; reject(e); };
     audio.load();
   });
 }
@@ -1461,102 +1415,16 @@ document.getElementById('pip-toggle').addEventListener('click', () => {
   }
 });
 
-// ─── 批量预合成所有旁白音频（同一连接顺序合成，确保人声一致） ───
-async function preSynthesizeAll(voiceId) {
-  // 收集所有旁白文本
-  const allSegments = [];
-  const segmentMap = []; // [{act, idx}] 用于映射结果
-  for (let act = 1; act <= 8; act++) {
-    const segs = narrations[act] || [];
-    segs.forEach((seg, idx) => {
-      allSegments.push(seg.text);
-      segmentMap.push({ act, idx });
-    });
-  }
-  const total = allSegments.length;
-
-  const barEl = document.getElementById('tts-preload-bar');
-  const pctEl = document.getElementById('tts-preload-pct');
-  if (pctEl) pctEl.textContent = `0 / ${total}`;
-
-  try {
-    // 一次性调用批量合成接口（后端在同一个 WebSocket 连接中顺序合成所有段落）
-    const resp = await fetch(`${TTS_API_BASE}/batch`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        segments: allSegments.map(text => ({ text })),
-        voice_id: voiceId,
-        speed_ratio: 1.0,
-        volume_ratio: 1.0,
-        pitch_ratio: 1.0,
-        encoding: 'mp3',
-      }),
-    });
-
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.detail || `Batch TTS API error ${resp.status}`);
-    }
-
-    const data = await resp.json();
-
-    // 将结果写入缓存
-    data.results.forEach((item, i) => {
-      const { act, idx } = segmentMap[i];
-      const binary = atob(item.audio_base64);
-      const bytes = new Uint8Array(binary.length);
-      for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
-      const blob = new Blob([bytes], { type: 'audio/mpeg' });
-      ttsAudioCache.set(`${act}-${idx}`, blob);
-
-      // 更新进度
-      const pct = Math.round(((i + 1) / total) * 100);
-      if (barEl) barEl.style.width = pct + '%';
-      if (pctEl) pctEl.textContent = `${i + 1} / ${total}`;
-    });
-
-    console.log(`TTS batch pre-synthesis complete: ${total} segments in ${data.duration_ms}ms, voice=${voiceId}`);
-  } catch (e) {
-    console.error('Batch pre-synthesis failed:', e);
-    // 标记 TTS 不可用，降级到 Web Speech API
-    ttsAvailable = false;
-  }
-}
-
-// ─── 初始化：检测 TTS + 预合成 ───
+// ─── 初始化：本地音频无需预合成 ───
 async function ttsInit() {
-  // 第一步：检测 API 可用性
-  try {
-    const resp = await fetch(`${TTS_API_BASE}/synthesize`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: '测试', encoding: 'mp3' }),
-    });
-    ttsAvailable = resp.ok;
-  } catch {
-    ttsAvailable = false;
-  }
-  if (!ttsAvailable) {
-    console.warn('TTS API unavailable, falling back to Web Speech API');
-    const overlay = document.getElementById('tts-preload-overlay');
-    if (overlay) overlay.classList.add('done');
-    return;
-  }
-  console.log('TTS API ready, starting pre-synthesis...');
-
-  // 第二步：锁定音色，批量预合成
-  preSynthVoiceId = selectedVoiceId;
-  document.getElementById('voice-select').disabled = true;
-  await preSynthesizeAll(preSynthVoiceId);
-
-  // 第三步：隐藏加载遮罩
+  // 本地文件直接可用，无需预合成
   const overlay = document.getElementById('tts-preload-overlay');
   if (overlay) overlay.classList.add('done');
+  console.log('Local audio mode: pre-synthesized files ready');
 }
 const ttsInitPromise = ttsInit();
 
-// ─── NARRATION CONTROLLER (火山引擎 TTS 顺序播放 + 字幕同步) ───
+// ─── NARRATION CONTROLLER (本地音频顺序播放 + 字幕同步) ───
 // 返回 Promise，在所有旁白段播完后 resolve
 function playNarration(actNum) {
   const texts = narrations[actNum] || [];
@@ -1571,7 +1439,7 @@ function playNarration(actNum) {
     narrationFinished = resolve;
 
     if (speechEnabled) {
-      // ── TTS 模式：顺序播放，每段播完后才启动下一段 ──
+      // ── 本地音频模式：顺序播放，每段播完后才启动下一段 ──
       const myToken = ++narrationToken;
       let idx = 0;
 
@@ -1585,45 +1453,16 @@ function playNarration(actNum) {
         document.getElementById('narration-text').classList.remove('show');
 
         try {
-          if (ttsAvailable) {
-            // 从预合成缓存读取音频（零延迟）
-            const cacheKey = `${actNum}-${idx}`;
-            const blob = ttsAudioCache.get(cacheKey);
-            if (!blob) {
-              console.warn(`TTS cache miss: ${cacheKey}, showing subtitle only`);
-              showSubtitle(text);
-              await new Promise(r => setTimeout(r, 3000));
-            } else {
-              if (myToken !== narrationToken) return;
-              document.getElementById('pip-avatar').classList.add('speaking');
-              const el = document.getElementById('narration-text');
-              el.textContent = text;
-              el.classList.add('show');
-              await playAudioBlob(blob);
-              if (myToken !== narrationToken) return;
-              document.getElementById('pip-avatar').classList.remove('speaking');
-            }
-          } else if (window.speechSynthesis) {
-            await new Promise((res) => {
-              const utter = new SpeechSynthesisUtterance(text);
-              utter.lang = 'zh-CN';
-              utter.rate = 0.92;
-              utter.pitch = 0.95;
-              utter.onstart = () => {
-                if (myToken !== narrationToken) return;
-                document.getElementById('pip-avatar').classList.add('speaking');
-                const el = document.getElementById('narration-text');
-                el.textContent = text;
-                el.classList.add('show');
-              };
-              utter.onend = () => { document.getElementById('pip-avatar').classList.remove('speaking'); res(); };
-              utter.onerror = () => { document.getElementById('pip-avatar').classList.remove('speaking'); showSubtitle(text); res(); };
-              window.speechSynthesis.speak(utter);
-            });
-          } else {
-            showSubtitle(text);
-            await new Promise(r => setTimeout(r, 3000));
-          }
+          // 本地文件模式
+          const audioSrc = `${AUDIO_BASE_PATH}act${actNum}-${idx}.mp3`;
+          if (myToken !== narrationToken) return;
+          document.getElementById('pip-avatar').classList.add('speaking');
+          const el = document.getElementById('narration-text');
+          el.textContent = text;
+          el.classList.add('show');
+          await playLocalAudio(audioSrc);
+          if (myToken !== narrationToken) return;
+          document.getElementById('pip-avatar').classList.remove('speaking');
 
           idx++;
           if (idx < texts.length && myToken === narrationToken) {
@@ -1632,8 +1471,9 @@ function playNarration(actNum) {
             resolve();
           }
         } catch (err) {
-          console.error('TTS playback error:', err);
+          console.error('Audio playback error:', err);
           showSubtitle(text);
+          document.getElementById('pip-avatar').classList.remove('speaking');
           idx++;
           if (idx < texts.length && myToken === narrationToken) {
             timers.push(setTimeout(playNext, 3000));
@@ -1716,7 +1556,7 @@ function goToAct(actNum) {
       const maxTimer = new Promise(r => { timers.push(setTimeout(r, dur)); });
       Promise.race([narrationDonePromise, maxTimer]).then(() => {
         if (isPlaying && myAct === actToken) {
-          timers.push(setTimeout(() => goToAct(actNum + 1), 1500));
+          timers.push(setTimeout(() => goToAct(actNum + 1), 3000));
         }
       });
     }
