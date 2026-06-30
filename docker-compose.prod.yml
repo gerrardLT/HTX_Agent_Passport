@@ -22,7 +22,7 @@ services:
     container_name: htx_passport_backend
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8001:8000"
     environment:
       # Neon 托管 PostgreSQL 连接串（含 ?sslmode=require），由 .env.prod 注入
       DATABASE_URL: ${DATABASE_URL}
