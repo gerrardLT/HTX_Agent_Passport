@@ -152,7 +152,11 @@ def create_app() -> FastAPI:
     app.include_router(tts_router.router, prefix="/api/tts", tags=["tts"])
 
     # 静态文件：产品演示 HTML 页面
-    demos_dir = Path(__file__).resolve().parent.parent / "design-demos"
+    # 静态文件服务：优先从 backend 内部找 design-demos（Docker 容器场景），
+    # 其次从项目根目录找（本地开发场景）。
+    demos_dir = Path(__file__).resolve().parent / "design-demos"
+    if not demos_dir.is_dir():
+        demos_dir = Path(__file__).resolve().parent.parent / "design-demos"
     if demos_dir.is_dir():
         app.mount("/static", StaticFiles(directory=str(demos_dir), html=True), name="static")
 
