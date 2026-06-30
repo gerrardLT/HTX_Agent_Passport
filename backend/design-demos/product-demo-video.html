@@ -1376,9 +1376,15 @@ function playLocalAudio(src) {
   return new Promise((resolve, reject) => {
     const audio = new Audio(src);
     currentAudio = audio;
+    // 标记：被外部 stop 时也能 resolve
+    audio._stopped = false;
     audio.oncanplaythrough = () => { audio.play().catch(reject); };
     audio.onended = () => { currentAudio = null; resolve(); };
     audio.onerror = (e) => { currentAudio = null; reject(e); };
+    // pause 事件：被 stopCurrentAudio() 强制停止时 resolve（不继续等 ended）
+    audio.onpause = () => {
+      if (audio._stopped) { resolve(); }
+    };
     audio.load();
   });
 }
@@ -1386,6 +1392,7 @@ function playLocalAudio(src) {
 // 停止当前音频播放
 function stopCurrentAudio() {
   if (currentAudio) {
+    currentAudio._stopped = true;  // 标记为外部停止
     currentAudio.pause();
     currentAudio.currentTime = 0;
     currentAudio = null;
