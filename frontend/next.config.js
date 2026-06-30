@@ -2,14 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  // 后端 API 默认端口 8000（docker-compose / 本地 uvicorn）
-  // NEXT_PUBLIC_API_BASE_URL 优先于此默认值
-  env: {
-    // 用 ?? 而非 ||：生产构建注入空字符串表示「同域相对路径」（请求 /api/...），
-    // 空字符串是合法值不应被 localhost 默认顶替；仅未定义时才回退本地开发地址。
-    NEXT_PUBLIC_API_BASE_URL:
-      process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000',
-  },
+  // 不在此手动声明 env：Next.js 会自动内联所有 NEXT_PUBLIC_ 前缀变量。
+  // 之前用 env 字段 + `?? 'http://localhost:8000'` 会在生产把 base 误回退到 localhost
+  // （空字符串 env 被 Next 忽略）。base 取值与回退逻辑统一收敛到 src/lib/api.ts 的 getApiBaseUrl()。
 };
 
 module.exports = nextConfig;

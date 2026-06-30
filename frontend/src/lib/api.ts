@@ -9,7 +9,13 @@ const DEFAULT_BASE_URL = 'http://localhost:8000';
 
 /** 取得后端基址，优先使用 NEXT_PUBLIC_API_BASE_URL。 */
 export function getApiBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_BASE_URL;
+  // 显式配置时优先（本地开发 .env.local 设为 http://localhost:8000 直连后端）。
+  const explicit = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (explicit) return explicit;
+  // 未显式配置（生产）：浏览器端用同域相对路径（''），由 nginx 转发 /api、/ws；
+  // 服务端渲染（standalone）回退到容器内默认后端地址。
+  // 注：前端各接口 path 已自带 /api 前缀，浏览器端 base 必须为空，避免 /api/api 重复或指向 localhost。
+  return typeof window !== 'undefined' ? '' : DEFAULT_BASE_URL;
 }
 
 export class ApiError extends Error {
