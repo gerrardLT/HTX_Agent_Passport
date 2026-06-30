@@ -24,11 +24,13 @@ export default function LandingPage() {
   const handleLogin = useCallback(async () => {
     try {
       await login();
-      router.push('/dashboard');
+      // 使用硬导航而非 Next.js 客户端路由，确保 dashboard 加载全新的服务端渲染页面，
+      // 避免客户端路由 prefetch 缓存导致加载旧版 chunk。
+      window.location.href = '/dashboard';
     } catch (err) {
       console.error('登录失败:', err);
     }
-  }, [login, router]);
+  }, [login]);
 
   // 滚动渐入
   useEffect(() => {
